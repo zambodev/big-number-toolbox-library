@@ -1,0 +1,11 @@
+*.txt
+.vscode
+*.o
+
+CMakeFiles/
+*.cmake
+bntl_test
+
+bin/
+build/
+lib/
