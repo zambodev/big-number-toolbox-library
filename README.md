@@ -1,7 +1,7 @@
 [![License](https://img.shields.io/github/license/Zambo-dev/big-number-toolbox-library?style=flat-square)](./LICENSE)
-[![Build](https://github.com/Zambo-dev/big-number-toolbox-library/actions/workflows/compile.yml/badge.svg)](https://github.com/Zambo-dev/big-number-toolbox-library/actions/workflows/compile.yml)
+<!--[![Build](https://github.com/Zambo-dev/big-number-toolbox-library/actions/workflows/compile.yml/badge.svg)](https://github.com/Zambo-dev/big-number-toolbox-library/actions/workflows/compile.yml)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/Zambo-dev/big-number-toolbox-library.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Zambo-dev/big-number-toolbox-library/context:cpp)
-
+-->
 # Big Number Toolbox Library
 
 This library implements mathematical operations for numbers over the usual 64bit limit as efficently as possible and tries to keep a reasonable readability
