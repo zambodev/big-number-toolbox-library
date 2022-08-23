@@ -14,11 +14,13 @@
  *	@param [in,out] Number Allocated number
  *	@param [in] Size Size in bytes
 */
-void bn_init(bn_t *number, size_t size)
+size_t bn_init(bn_t *number, size_t size)
 {
 	size = (size % sizeof(ulong) == 0) ? size/sizeof(ulong) : size/sizeof(ulong)+1;
 	number->size = size * sizeof(ulong);
 	number->num = (size != 0) ? (ulong *)calloc(size, sizeof(ulong)) : NULL;
+
+	return number->size;
 }
 
 /**
@@ -26,11 +28,13 @@ void bn_init(bn_t *number, size_t size)
  *	@param [in,out] Number Allocated number
  *	@param [in] Number Value
 */
-void bn_init_n(bn_t *number, ulong value)
+size_t bn_init_n(bn_t *number, ulong value)
 {
 	number->size = sizeof(ulong);
 	number->num = (ulong *)calloc(1, sizeof(ulong));
 	*(number->num) = value;
+
+	return number->size;
 }
 
 /**
@@ -38,7 +42,7 @@ void bn_init_n(bn_t *number, ulong value)
  *	@param [in,out] Number Allocated number
  *	@param [in] String Char* number
 */
-void bn_init_s(bn_t *number, char* string)
+size_t bn_init_s(bn_t *number, char* string)
 {
 	size_t length = strlen(string);
 	bn_init(number, length / 8);
@@ -75,4 +79,6 @@ void bn_init_s(bn_t *number, char* string)
 			idx = 7;
 		}
 	}
+
+	return number->size;
 }

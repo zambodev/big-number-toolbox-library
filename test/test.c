@@ -16,12 +16,12 @@ int main()
 	result = malloc(sizeof(bn_t));
 	result2 = malloc(sizeof(bn_t));
 
-	bn_init(result, 10);
-	bn_init_n(result2, 0b00000000000000000000000000000010);
+	printf("Allocated %ld bytes\n", bn_init(result, 10));
+	printf("Allocated %ld bytes\n", bn_init_n(result2, 0b00000000000000000000000000000010));
 
-	puts("result");
+	puts("result:");
 	bn_print(result);
-	puts("result2");
+	puts("result2:");
 	bn_print(result2);
 
 	if(bn_cpy(result, result2) == -1) return EXIT_FAILURE;
