@@ -17,14 +17,14 @@ int main()
 	result2 = malloc(sizeof(bn_t));
 
 	bn_init(result, 10);
-	bn_init_n(result2, 2);
+	bn_init_n(result2, 0b00000000000000000000000000000010);
 
 	puts("result");
 	bn_print(result);
 	puts("result2");
 	bn_print(result2);
 
-	bn_cpy(result, result2);
+	if(bn_cpy(result, result2) == -1) return EXIT_FAILURE;
 	puts("result copied");
 	bn_print(result);
 

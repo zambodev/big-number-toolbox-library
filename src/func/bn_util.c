@@ -72,7 +72,7 @@ byte bn_cpy(bn_t *result, bn_t *number)
 	if((tmp = realloc(result->num, size)) == NULL)
 		return -1;
 
-	number->num = tmp;
+	result->num = tmp;
 	result->size = size;
 
 	ulong *res = result->num;
