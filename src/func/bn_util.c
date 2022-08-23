@@ -35,9 +35,9 @@ void bn_rev(bn_t *number)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	byte *start = (byte *)number->num;
-	byte *end = (byte *)number->num + number->size - 1;
-	byte tmp;
+	ubyte *start = (ubyte *)number->num;
+	ubyte *end = (ubyte *)number->num + number->size - 1;
+	ubyte tmp;
 	size_t size = number->size / 2;
 
 	while (size > 0)
@@ -107,16 +107,31 @@ void bn_hcpy(bn_t *result, bn_t *number)
 	if (result->num == NULL)
 		bn_init(result, number->size);
 
-	ubyte *res = (ubyte *)result->num + result->size - 1;
-	ubyte *num = (ubyte *)number->num + number->size - 1;
+	ubyte *res, *num;
+	ulong tmp = 1;
+	byte add;
+
+	if(*(ubyte *)&tmp == 1) 		/* Small endian */
+	{
+		res = (ubyte *)result->num;
+		num = (ubyte *)number->num;
+		add = 1;
+	}
+	else							/* Big endian */
+	{
+		res = (ubyte *)result->num + result->size - 1;
+		num = (ubyte *)number->num + number->size - 1;
+		add = -1;
+	}
+
 	size_t num_size = number->size;
 	size_t res_size = result->size;
 
 	while (num_size > 0 && res_size > 0)
 	{
 		*res = *num;
-		--res;
-		--num;
+		res += add;
+		num += add;
 		--num_size;
 		--res_size;
 	}
@@ -124,7 +139,7 @@ void bn_hcpy(bn_t *result, bn_t *number)
 	while (res_size > 0)
 	{
 		*res = 0;
-		--res;
+		res += add;
 		--res_size;
 	}
 }
@@ -320,13 +335,11 @@ void bn_sr(bn_t *number)
 
 	while (size > 0)
 	{
-		if ((*num & check) != 0)
-			tmp = 128;
+		if ((*num & check) != 0) tmp = 128;
 
 		*num >>= 1;
 
-		if (carry != 0)
-			*num |= carry;
+		if (carry != 0) *num |= carry;
 
 		carry = tmp;
 		tmp = 0;
