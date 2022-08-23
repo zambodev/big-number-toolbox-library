@@ -14,16 +14,12 @@
  */
 void bn_free(bn_t *number)
 {
-	if (number == NULL)
-		return;
 	if (number->num != NULL)
 	{
 		free(number->num);
 		number->num = NULL;
 	}
 	number->size = 0;
-	free(number);
-	number = NULL;
 }
 
 /**

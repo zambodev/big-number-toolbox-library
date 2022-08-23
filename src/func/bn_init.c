@@ -32,7 +32,7 @@ size_t bn_init_n(bn_t *number, ulong value)
 {
 	number->size = sizeof(ulong);
 	number->num = (ulong *)calloc(1, sizeof(ulong));
-	*(number->num) = value;
+	*(number->num) |= value;
 
 	return number->size;
 }
