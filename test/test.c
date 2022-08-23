@@ -24,9 +24,11 @@ int main()
 	puts("result2:");
 	bn_print(result2);
 
-	if(bn_cpy(result, result2) == -1) return EXIT_FAILURE;
+	bn_ncpy(result, result2, 2);
 	puts("result copied");
 	bn_print(result);
+
+
 
 	/* Free memory */
 	bn_free(result);

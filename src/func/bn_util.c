@@ -159,24 +159,38 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
 	if (result->num == NULL)
 		bn_init(result, size);
 
-	ubyte *res = (ubyte *)result->num + result->size - 1;
-	ubyte *num = (ubyte *)number->num + number->size - 1;
+	ubyte *res, *num;
+	ulong tmp = 1;
+	byte add;
+
+	if(*(ubyte *)&tmp == 1) 		/* Small endian */
+	{
+		res = (ubyte *)result->num;
+		num = (ubyte *)number->num;
+		add = 1;
+	}
+	else							/* Big endian */
+	{
+		res = (ubyte *)result->num + result->size - 1;
+		num = (ubyte *)number->num + number->size - 1;
+		add = -1;
+	}
 	size_t res_size = result->size;
 
 	while (size > 0)
 	{
 		*res = *num;
-		res--;
-		num--;
-		size--;
-		res_size--;
+		res += add;
+		num += add;
+		--size;
+		--res_size;
 	}
 
 	while (res_size > 0)
 	{
 		*res = 0;
-		res--;
-		res_size--;
+		res += add;
+		--res_size;
 	}
 
 	return 0;
