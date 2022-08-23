@@ -227,17 +227,30 @@ void bn_srk(bn_t *number)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	ubyte *num = (ubyte *)number->num;
-	size_t size, old_size;
-	old_size = size = number->size;
+	ulong *num;
+	ulong tmp;
+	byte add;
 
-	while (size - 1 > 0)
+	if(*(ubyte *)&tmp == 1) 		/* Small endian */
 	{
-		if ((*num & 0b11111111) != 0)
+		num = number->num;
+		add = 1;
+	}
+	else							/* Big endian */
+	{
+		num = number->num + number->size - 1;
+		add = -1;
+	}
+
+	size_t size, old_size;
+	old_size = size = number->size / sizeof(int);
+
+	while (--size > 0)
+	{
+		if ((*num & INT_MAX) != 0)
 			break;
 
-		num++;
-		size--;
+		num += add;
 	}
 
 	if (size != old_size)
@@ -245,12 +258,7 @@ void bn_srk(bn_t *number)
 		bn_t *tmp = malloc(sizeof(bn_t));
 		bn_init(tmp, size);
 		bn_ncpy(tmp, number, size);
-
-		number->num = realloc(number->num, size);
-		number->size = size;
-
-		bn_hcpy(number, tmp);
-
+		bn_cpy(number, tmp);
 		bn_free(tmp);
 	}
 }
