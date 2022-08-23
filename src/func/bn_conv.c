@@ -18,10 +18,10 @@
 char* bntobs(bn_t *number)
 {	
 	char* result = (char*) malloc(number->size*8+1);
-	byte* res = (byte*)result;
-	byte* num = number->num;
-	byte tmp;
-	byte i;
+	ubyte *res = (ubyte *)result;
+	ubyte *num = (ubyte *)number->num;
+	ubyte tmp;
+	ubyte i;
 	size_t size = number->size;
 
 	memset(result, ASCII_ZERO, size*8+1);
@@ -37,14 +37,14 @@ char* bntobs(bn_t *number)
 			*res = (tmp % 2) + ASCII_ZERO;
 			tmp >>= 1;
 		
-			i++;
-			res--;
+			++i;
+			--res;
 		}
 		
 		res += i;
 
-		num++;
-		size--;
+		++num;
+		--size;
 	}
 
 	*res = '\0';
