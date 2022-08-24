@@ -224,7 +224,7 @@ void bn_srk(bn_t *number)
 		return;
 
 	ulong *num;
-	ulong tmp;
+	ulong tmp = 1;
 	byte add;
 
 	if(*(ubyte *)&tmp == 1) 		/* Small endian */
@@ -263,24 +263,35 @@ void bn_srk(bn_t *number)
  * 	@brief Shift value left by one bit
  *	@param [in,out] number Initialized number
  */
-void bn_sl(bn_t *number)
+void bn_sl(bn_t *number, ulong val)
 {
 	if (number == NULL || number->num == NULL)
 		return;
 
-	byte *num = (ubyte *)number->num + number->size - 1;
+	ulong *num;
+	ulong tmp = 1;
+	byte add;
+
+	if(*(ubyte *)&tmp == 1) 		/* Small endian */
+	{
+		num = number->num;
+		add = 1;
+	}
+	else							/* Big endian */
+	{
+		num = number->num + number->size - 1;
+		add = -1;
+	}
 	size_t size = number->size;
 
 	ubyte carry = 0;
-	ubyte tmp = 0;
-	ubyte check = 0b10000000;
+	ubyte shift = sizeof(ulong)*8-val;
 
 	while (size > 0)
 	{
-		if ((*num & check) != 0)
-			++tmp;
+		tmp = (*num & (INT_MAX << shift)) >> shift;
 
-		*num <<= 1;
+		*num <<= val;
 
 		if (carry != 0)
 			*num |= carry;
@@ -288,7 +299,7 @@ void bn_sl(bn_t *number)
 		carry = tmp;
 		tmp = 0;
 
-		--num;
+		num += add;
 		--size;
 	}
 }
@@ -301,38 +312,7 @@ void bn_sl(bn_t *number)
  */
 void bn_ssl(bn_t *output, bn_t *number)
 {
-	if (number == NULL || number->num == NULL)
-		return;
 
-	ubyte *num = (ubyte *)number->num + number->size - 1;
-	size_t size = number->size;
-
-	ubyte carry = 0;
-	ubyte tmp = 0;
-	ubyte check = 0b10000000;
-
-	while (size > 0)
-	{
-		if ((*num & check) != 0)
-			++tmp;
-
-		if (size == 1)
-		{
-			bn_sl(output);
-			*(output->num + output->size - 1) |= (*num & check) >> 7;
-		}
-
-		*num <<= 1;
-
-		if (carry != 0)
-			*num |= carry;
-
-		carry = tmp;
-		tmp = 0;
-
-		--num;
-		--size;
-	}
 }
 
 /**
@@ -340,30 +320,44 @@ void bn_ssl(bn_t *output, bn_t *number)
  *	@param [in,out] number Initialized number
  * 	@note Require initialized number
  */
-void bn_sr(bn_t *number)
+void bn_sr(bn_t *number, ulong val)
 {
-	if(number == NULL || number->num == NULL) return;
+	if (number == NULL || number->num == NULL)
+		return;
 
-	ubyte *num = (ubyte *)number->num;
+	ulong *num;
+	ulong tmp = 1;
+	byte add;
+
+	if(*(ubyte *)&tmp == 1) 		/* Small endian */
+	{
+		num = number->num;
+		add = 1;
+	}
+	else							/* Big endian */
+	{
+		num = number->num + number->size - 1;
+		add = -1;
+	}
 	size_t size = number->size;
 
 	ubyte carry = 0;
-	ubyte tmp = 0;
-	ubyte check = 0b00000001;
+	ubyte shift = sizeof(ulong)*8-val;
 
 	while (size > 0)
 	{
-		if ((*num & check) != 0) tmp = 128;
+		tmp = (*num & (INT_MAX >> shift)) << shift;
 
-		*num >>= 1;
+		*num >>= val;
 
-		if (carry != 0) *num |= carry;
+		if (carry != 0)
+			*num |= carry;
 
 		carry = tmp;
 		tmp = 0;
 
-		num++;
-		size--;
+		num += add;
+		--size;
 	}
 }
 
@@ -375,37 +369,7 @@ void bn_sr(bn_t *number)
  */
 void bn_ssr(bn_t *output, bn_t *number)
 {
-	if(number == NULL || number->num == NULL) return;
 
-	ubyte *num = (ubyte *)number->num + number->size - 1;
-	size_t size = number->size;
-
-	ubyte carry = 0;
-	ubyte tmp = 0;
-	ubyte check = 0b00000001;
-
-	while (size > 0)
-	{
-		if ((*num & check) != 0)
-			tmp++;
-
-		if (size == 1)
-		{
-			bn_sl(output);
-			*output->num |= (*num & check) << 7;
-		}
-
-		*num >>= 1;
-
-		if (carry != 0)
-			*num |= carry;
-
-		carry = tmp;
-		tmp = 0;
-
-		num--;
-		size--;
-	}
 }
 
 /**

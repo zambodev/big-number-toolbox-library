@@ -73,9 +73,9 @@ void bn_inc(bn_t *number);					/* Increment number by one */
 void bn_dec(bn_t *number);					/* Decrement number by one */
 void bn_ext(bn_t *number, size_t bytes);				/* Extend number size by n bytes */
 void bn_free(bn_t *number);					/* Free number */
-void bn_sl(bn_t *number);					/* Shift number left by one bit */
+void bn_sl(bn_t *number, ulong val);					/* Shift number left by one bit */
 void bn_ssl(bn_t *output, bn_t *number);				/* Shift number left by one bit and store the overflow in output */
-void bn_sr(bn_t *number);					/* Shift number right by one bit */
+void bn_sr(bn_t *number, ulong val);					/* Shift number right by one bit */
 void bn_ssr(bn_t *output, bn_t *number);				/* Shift number right by one bit and store the overflow in output */
 void bn_srk(bn_t *number);					/* Shrink empty bytes from the front of the number */
 void bn_cpy(bn_t *result, bn_t *number);				/* Copy number into result reallocating the size */

@@ -12,7 +12,7 @@ int main()
 	bn_t result, result2;
 
 	printf("Allocated %ld bytes\n", bn_init(&result, 10));
-	printf("Allocated %ld bytes\n", bn_init_n(&result2, 0b00000000000000000000000000000010));
+	printf("Allocated %ld bytes\n", bn_init_n(&result2, 0b00000000000000000000000010001100));
 
 	puts("result:");
 	bn_print(&result);
@@ -23,11 +23,13 @@ int main()
 	puts("result ext");
 	bn_print(&result2);
 
+	bn_sl(&result2, 4);
+	puts("result sl");
+	bn_print(&result2);
 
-	bn_t num;
-	ulong val = 1235;
-	bn_init_n(&num, val);
-	bn_print(&num);
+	bn_sr(&result2, 4);
+	puts("result sr");
+	bn_print(&result2);
 
 	/* Free memory */
 	bn_free(&result);
