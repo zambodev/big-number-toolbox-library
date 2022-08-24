@@ -300,7 +300,7 @@ void bn_sl(bn_t *number, ulong val)
 		tmp = 0;
 
 		num += add;
-		--size;zx
+		--size;
 	}
 }
 

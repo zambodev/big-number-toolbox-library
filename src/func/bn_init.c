@@ -42,41 +42,56 @@ size_t bn_init_n(bn_t *number, ulong value)
  *	@param [in,out] Number Allocated number
  *	@param [in] String Char* number
 */
-size_t bn_init_s(bn_t *number, char* string)
+size_t bn_init_s(bn_t *number, char *string)
 {
 	size_t length = strlen(string);
-	bn_init(number, length / 8);
+	bn_init(number, (length-1) / 8);
 
 	ulong tmp = 1;	
-	byte addval;
+	byte numaddval, straddval;
 	ubyte *res;
+	char *str;
+	ubyte shift;
+
+	if(*string == 'L')			/* Little endian */
+	{
+		str = string+1;
+		shift = 7;
+		straddval = 1;
+	}
+	else if(*string == 'B')		/* Big endian */
+	{
+		str = string+length-1;
+		shift = 0;
+		straddval = -1;
+	}
+	else
+		return 0;
 
 	if(*(ubyte *)&tmp == 1)		/* Little endian */
 	{
-		addval = 1;
+		numaddval = 1;
 		res = (ubyte *)number->num;
 	}
 	else						/* Big endian */
 	{
-		addval = -1;
+		numaddval = -1;
 		res = (ubyte *)number->num + number->size - 1;
 	}
 
-	char *str = string;
-	ubyte idx = 7;
-
+	--length;
 	while(length > 0)
 	{
-		*res |= (*str - ASCII_ZERO) << idx;
-
-		--idx;
+		*res |= (*str - ASCII_ZERO) << shift;
+		printf("%x %c | ", *(ubyte *)res, *str);
+		shift -= straddval;
+		str += straddval;
 		--length;
-		++str;
 
 		if((length) % 8 == 0)
 		{	
-			res += addval;
-			idx = 7;
+			res += numaddval;
+			shift = (*string == 'L') ? 7 : 0;
 		}
 	}
 
