@@ -265,7 +265,7 @@ void bn_srk(bn_t *number)
  */
 void bn_sl(bn_t *number, ulong val)
 {
-	if (number == NULL || number->num == NULL)
+	if (number == NULL || number->num == NULL || val > sizeof(ulong)*8)
 		return;
 
 	ulong *num;
@@ -300,7 +300,7 @@ void bn_sl(bn_t *number, ulong val)
 		tmp = 0;
 
 		num += add;
-		--size;
+		--size;zx
 	}
 }
 
@@ -322,7 +322,7 @@ void bn_ssl(bn_t *output, bn_t *number)
  */
 void bn_sr(bn_t *number, ulong val)
 {
-	if (number == NULL || number->num == NULL)
+	if (number == NULL || number->num == NULL || val > sizeof(ulong)*8)
 		return;
 
 	ulong *num;
