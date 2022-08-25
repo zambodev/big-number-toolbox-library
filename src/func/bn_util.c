@@ -265,42 +265,62 @@ void bn_srk(bn_t *number)
  */
 void bn_sl(bn_t *number, ulong val)
 {
-	if (number == NULL || number->num == NULL || val > sizeof(ulong)*8)
+	if (number == NULL || number->num == NULL)
 		return;
 
-	ulong *num;
+	ulong *end, *start;
 	ulong tmp = 1;
+	ubyte carry = 0;
 	byte add;
-
+	size_t size;
+	
+	/* Start from the higher value */
 	if(*(ubyte *)&tmp == 1) 		/* Small endian */
 	{
-		num = number->num;
+		end = number->num + number->size/sizeof(ulong) - 1;
+		start = number->num;
 		add = 1;
 	}
 	else							/* Big endian */
 	{
-		num = number->num + number->size - 1;
+		end = number->num;
+		start = number->num + number->size/sizeof(ulong) - 1;
 		add = -1;
 	}
-	size_t size = number->size;
 
-	ubyte carry = 0;
-	ubyte shift = sizeof(ulong)*8-val;
-
-	while (size > 0)
+	while(val >= sizeof(ulong)*8)
 	{
-		tmp = (*num & (INT_MAX << shift)) >> shift;
+		ulong *numcpy = *end;
+		size = number->size/sizeof(ulong);
+		
+		while (size > 1)
+		{
+			*end = *(end-add);
+			end -= add;
+			--size;
+		}
+		*end = 0;
+		val -= sizeof(ulong)*8;
+	}
 
-		*num <<= val;
+	if(val > 0)
+	{
+		size = number->size/sizeof(ulong);
+		while (size > 0)
+		{
+			tmp = (*start & (INT_MAX << val)) >> val;
 
-		if (carry != 0)
-			*num |= carry;
+			*start <<= val;
 
-		carry = tmp;
-		tmp = 0;
+			if (carry != 0)
+				*start |= carry;
 
-		num += add;
-		--size;
+			carry = tmp;
+			tmp = 0;
+
+			start += add;
+			--size;
+		}
 	}
 }
 
@@ -322,43 +342,7 @@ void bn_ssl(bn_t *output, bn_t *number)
  */
 void bn_sr(bn_t *number, ulong val)
 {
-	if (number == NULL || number->num == NULL || val > sizeof(ulong)*8)
-		return;
 
-	ulong *num;
-	ulong tmp = 1;
-	byte add;
-
-	if(*(ubyte *)&tmp == 1) 		/* Small endian */
-	{
-		num = number->num;
-		add = 1;
-	}
-	else							/* Big endian */
-	{
-		num = number->num + number->size - 1;
-		add = -1;
-	}
-	size_t size = number->size;
-
-	ubyte carry = 0;
-	ubyte shift = sizeof(ulong)*8-val;
-
-	while (size > 0)
-	{
-		tmp = (*num & (INT_MAX >> shift)) << shift;
-
-		*num >>= val;
-
-		if (carry != 0)
-			*num |= carry;
-
-		carry = tmp;
-		tmp = 0;
-
-		num += add;
-		--size;
-	}
 }
 
 /**
