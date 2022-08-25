@@ -303,25 +303,23 @@ void bn_sl(bn_t *number, ulong val)
 		val -= sizeof(ulong)*8;
 	}
 
-	if(val > 0)
+	size = number->size/sizeof(ulong);
+	while (size > 0 && val > 0)
 	{
-		size = number->size/sizeof(ulong);
-		while (size > 0)
-		{
-			tmp = (*start & (INT_MAX << val)) >> val;
+		tmp = (*start & (INT_MAX << val)) >> val;
 
-			*start <<= val;
+		*start <<= val;
 
-			if (carry != 0)
-				*start |= carry;
+		if (carry != 0)
+			*start |= carry;
 
-			carry = tmp;
-			tmp = 0;
+		carry = tmp;
+		tmp = 0;
 
-			start += add;
-			--size;
-		}
+		start += add;
+		--size;
 	}
+
 }
 
 /**
