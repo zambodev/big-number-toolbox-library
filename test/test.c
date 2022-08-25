@@ -23,7 +23,7 @@ int main()
 	puts("result ext");
 	bn_print(&result2);
 
-	bn_sl(&result2, sizeof(ulong)*8+2);
+	bn_sl(&result2, 34);
 	puts("result sl");
 	bn_print(&result2);
 
