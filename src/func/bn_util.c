@@ -268,58 +268,63 @@ void bn_sl(bn_t *number, ulong val)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	ulong *end, *start;
-	ulong tmp = 1;
+	ulong *num_end, *newnum_start, *newnum_end;
+	ulong tmp = 1, shift;
 	ubyte carry = 0;
-	byte add;
+	byte inc;
 	size_t size;
 	
+	ulong *newnum = (ulong *)calloc(number->size/sizeof(ulong), sizeof(ulong));
+
 	/* Start from the higher value */
-	if(*(ubyte *)&tmp == 1) 		/* Small endian */
+	if(*(ubyte *)&tmp == 1) 		/* Little endian */
 	{
-		end = number->num + number->size/sizeof(ulong) - 1;
-		start = number->num;
-		add = 1;
+		num_end = number->num + number->size/sizeof(ulong) - 1;
+		newnum_start = newnum;
+		newnum_end = newnum + number->size/sizeof(ulong) - 1;
+		inc = 1;
 	}
 	else							/* Big endian */
 	{
-		end = number->num;
-		start = number->num + number->size/sizeof(ulong) - 1;
-		add = -1;
+		num_end = number->num;
+		newnum_start = newnum + number->size/sizeof(ulong) - 1;
+		newnum_end = newnum;
+		inc = -1;
 	}
 
-	while(val >= sizeof(ulong)*8)
+	shift = val/(sizeof(ulong)*8);
+	val -= shift*(sizeof(ulong)*8);
+	size = number->size/sizeof(ulong) - shift;
+	num_end -= inc*shift;
+	
+	while(size > 0)
 	{
-		ulong *numcpy = *end;
-		size = number->size/sizeof(ulong);
-		
-		while (size > 1)
-		{
-			*end = *(end-add);
-			end -= add;
-			--size;
-		}
-		*end = 0;
-		val -= sizeof(ulong)*8;
+		*newnum_end = *num_end;
+		newnum_end -= inc;
+		num_end -= inc;
+		--size;
 	}
 
 	size = number->size/sizeof(ulong);
+	
 	while (size > 0 && val > 0)
 	{
-		tmp = (*start & (INT_MAX << val)) >> val;
+		tmp = (*newnum_start & (INT_MAX << val)) >> val;
 
-		*start <<= val;
+		*newnum_start <<= val;
 
 		if (carry != 0)
-			*start |= carry;
+			*newnum_start |= carry;
 
 		carry = tmp;
 		tmp = 0;
 
-		start += add;
+		newnum_start += inc;
 		--size;
 	}
 
+	free(number->num);
+	number->num = newnum;
 }
 
 /**
