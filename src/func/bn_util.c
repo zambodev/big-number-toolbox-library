@@ -55,10 +55,8 @@ void bn_rev(bn_t *number)
  */
 void bn_cpy(bn_t *result, bn_t *number)
 {
-	if (number == NULL || number->num == NULL)
+	if (result == NULL || number == NULL || number->num == NULL)
 		return;
-	if (result == NULL)
-		result = (bn_t *)malloc(sizeof(bn_t));
 	if (result->num == NULL)
 		bn_init(result, number->size);
 	else
@@ -66,11 +64,9 @@ void bn_cpy(bn_t *result, bn_t *number)
 		ulong *tmp;
 		if ((tmp = realloc(result->num, number->size)) == NULL)
 			return;
-		else
-		{
-			result->num = tmp;
-			result->size = number->size;
-		}
+
+		result->num = tmp;
+		result->size = number->size;
 	}
 
 	size_t size = number->size;
@@ -96,28 +92,26 @@ void bn_cpy(bn_t *result, bn_t *number)
  */
 void bn_hcpy(bn_t *result, bn_t *number)
 {
-	if (number == NULL || number->num == NULL)
+	if (result == NULL || number == NULL || number->num == NULL)
 		return;
-	if (result == NULL)
-		result = (bn_t *)malloc(sizeof(bn_t));
 	if (result->num == NULL)
 		bn_init(result, number->size);
 
 	ubyte *res, *num;
 	ulong tmp = 1;
-	byte add;
+	byte inc;
 
 	if(*(ubyte *)&tmp == 1) 		/* Small endian */
 	{
 		res = (ubyte *)result->num;
 		num = (ubyte *)number->num;
-		add = 1;
+		inc = 1;
 	}
 	else							/* Big endian */
 	{
 		res = (ubyte *)result->num + result->size - 1;
 		num = (ubyte *)number->num + number->size - 1;
-		add = -1;
+		inc = -1;
 	}
 
 	size_t num_size = number->size;
@@ -126,8 +120,8 @@ void bn_hcpy(bn_t *result, bn_t *number)
 	while (num_size > 0 && res_size > 0)
 	{
 		*res = *num;
-		res += add;
-		num += add;
+		res += inc;
+		num += inc;
 		--num_size;
 		--res_size;
 	}
@@ -135,7 +129,7 @@ void bn_hcpy(bn_t *result, bn_t *number)
 	while (res_size > 0)
 	{
 		*res = 0;
-		res += add;
+		res += inc;
 		--res_size;
 	}
 }
@@ -148,36 +142,37 @@ void bn_hcpy(bn_t *result, bn_t *number)
  */
 void bn_ncpy(bn_t *result, bn_t *number, size_t size)
 {
-	if (number == NULL || number->num == NULL)
+	if (result == NULL || number == NULL || number->num == NULL)
 		return;
-	if (result == NULL)
-		result = (bn_t *)malloc(sizeof(bn_t));
 	if (result->num == NULL)
 		bn_init(result, size);
 
 	ubyte *res, *num;
 	ulong tmp = 1;
-	byte add;
+	byte inc;
 
 	if(*(ubyte *)&tmp == 1) 		/* Small endian */
 	{
 		res = (ubyte *)result->num;
 		num = (ubyte *)number->num;
-		add = 1;
+		inc = 1;
 	}
 	else							/* Big endian */
 	{
 		res = (ubyte *)result->num + result->size - 1;
 		num = (ubyte *)number->num + number->size - 1;
-		add = -1;
+		inc = -1;
 	}
+
 	size_t res_size = result->size;
+	if(size > number->size)
+		size = (number->size > res_size) ? res_size : number->size;
 
 	while (size > 0)
 	{
 		*res = *num;
-		res += add;
-		num += add;
+		res += inc;
+		num += inc;
 		--size;
 		--res_size;
 	}
@@ -185,7 +180,7 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
 	while (res_size > 0)
 	{
 		*res = 0;
-		res += add;
+		res += inc;
 		--res_size;
 	}
 
@@ -206,11 +201,11 @@ void bn_ext(bn_t *number, size_t bytes)
 		bn_init(number, bytes);
 	else
 	{
-		bn_t *tmp = (bn_t *)malloc(sizeof(bn_t));
-		bn_init(tmp, number->size + bytes);
-		bn_hcpy(tmp, number);
-		bn_cpy(number, tmp);
-		bn_free(tmp);
+		bn_t tmp;
+		bn_init(&tmp, number->size + bytes);
+		bn_hcpy(&tmp, number);
+		bn_cpy(number, &tmp);
+		bn_free(&tmp);
 	}
 }
 
@@ -226,6 +221,7 @@ void bn_srk(bn_t *number)
 	ulong *num;
 	ulong tmp = 1;
 	byte add;
+	size_t size, old_size;
 
 	if(*(ubyte *)&tmp == 1) 		/* Small endian */
 	{
@@ -238,7 +234,6 @@ void bn_srk(bn_t *number)
 		add = -1;
 	}
 
-	size_t size, old_size;
 	old_size = size = number->size / sizeof(int);
 
 	while (--size > 0)
@@ -251,11 +246,11 @@ void bn_srk(bn_t *number)
 
 	if (size != old_size)
 	{
-		bn_t *tmp = malloc(sizeof(bn_t));
-		bn_init(tmp, size);
-		bn_ncpy(tmp, number, size);
-		bn_cpy(number, tmp);
-		bn_free(tmp);
+		bn_t tmp;
+		bn_init(&tmp, size);
+		bn_ncpy(&tmp, number, size);
+		bn_cpy(number, &tmp);
+		bn_free(&tmp);
 	}
 }
 
