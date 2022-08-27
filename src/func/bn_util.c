@@ -236,7 +236,7 @@ void bn_srk(bn_t *number)
 	
 	while (--size > 0)
 	{
-		if ((*num & INT_MAX) != 0)
+		if ((*num & ULONG_MAX) != 0)
 			break;
 
 		num += add;
@@ -244,7 +244,7 @@ void bn_srk(bn_t *number)
 	
 	/* Resize number */
 	if (size != old_size)
-	{
+	{ 
 		bn_t tmp;
 		bn_init(&tmp, size);
 		bn_ncpy(&tmp, number, size);
@@ -261,71 +261,60 @@ void bn_sl(bn_t *number, ulong val)
 {
 	if (number == NULL || number->num == NULL)
 		return;
-
-	ulong *num_end, *newnum, *start, *end, tmp = 1, shift;
-	ubyte carry = 0;
+ 
+	ulong tmp = 1, shift, *startl;
+	ubyte carry = 0, *startb, *endb;
 	byte inc;
 	size_t size;
 	
-	/* Alocate new number for the byte shifting */
-	newnum = (val >= sizeof(ulong)*8) ? (ulong *)calloc(number->size/sizeof(ulong), sizeof(ulong)) : NULL;
-
 	/* Start from the higher value */
 	if(*(ubyte *)&tmp == 1) 		/* Little endian */
 	{
-		num_end = number->num + number->size/sizeof(ulong) - 1;
-		start = (newnum != NULL) ? newnum : number->num;
-		end = ((newnum!= NULL) ? newnum : number-> num) + number->size/sizeof(ulong) - 1;
+		startl = number->num;
+		startb = (ubyte *)number->num;
 		/* Endian dependent increment value */
 		inc = 1;
 	}
 	else							/* Big endian */
 	{
-		num_end = number->num;
-		start = ((newnum != NULL) ? newnum : number->num) + number->size/sizeof(ulong) - 1; 
-		end = (newnum != NULL) ? newnum : number->num;
+		startl = number->num  + number->size/sizeof(ulong) - 1;
+		startb = (ubyte *)number->num + number->size -1;
 		/* Endian dependent increment value */
 		inc = -1;
 	}
 
 	/* Full byte to be shifted */
-	shift = val/(sizeof(ulong)*8);
+	shift = val/8;
 	/* Rest bits to be shifted */
-	val -= shift*(sizeof(ulong)*8);
+	val -= shift*8;
 	/* Bytes offset to be copyed */
-	num_end -= inc*shift;
+	endb = startb+(inc*shift);
 
 	while(shift > 0)
 	{
-		*end = *num_end;
+		*endb = *startb;
+		*startb = 0;
 		/* Decrement iterators */
-		end -= inc;
-		num_end -= inc;
+		endb += inc;
+		startb += inc;
 		--shift;
 	}
 
 	size = number->size/sizeof(ulong);
-	
+
 	while (size > 0 && val > 0)
 	{
 		/* Store the carry for the next chunk */
-		tmp = (*start & (INT_MAX << val)) >> val;
+		tmp = (*startl & (ULONG_MAX << val)) >> val;
 		/* Shift the chunk */
-		*start <<= val;
+		*startl <<= val;
 		/* Insert carry bytes in the shifteed space */
-		*start |= carry;
-		/* Set carry for next round */
+		*startl |= carry;
+		
 		carry = tmp;
 		tmp = 0;
-		/* Increment iterators */
-		start += inc;
+		startl += inc;
 		--size;
-	}
-	
-	if(newnum != NULL)
-	{
-		free(number->num);
-		number->num = newnum;
 	}
 }
 
