@@ -183,8 +183,6 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
 		res += inc;
 		--res_size;
 	}
-
-	return 0;
 }
 
 /**
@@ -263,8 +261,7 @@ void bn_sl(bn_t *number, ulong val)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	ulong *num_end, *newnum, *start, *end;
-	ulong tmp = 1, shift;
+	ulong *num_end, *newnum, *start, *end, tmp = 1, shift;
 	ubyte carry = 0;
 	byte inc;
 	size_t size;

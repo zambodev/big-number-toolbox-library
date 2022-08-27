@@ -11,8 +11,8 @@ int main()
 {	
 	bn_t result, result2;
 
-	printf("Allocated %ld bytes\n", bn_init_s(&result, "L10001100000000000000000000000000"));
-	printf("Allocated %ld bytes\n", bn_init_n(&result2, 0b00000000000000000000000010001100));
+	printf("Allocated %d bytes\n", bn_init_s(&result, "L10001100000000000000000000000000"));
+	printf("Allocated %d bytes\n", bn_init_n(&result2, 0b00000000000000000000000010001100));
 
 	puts("result:");
 	bn_print(&result);

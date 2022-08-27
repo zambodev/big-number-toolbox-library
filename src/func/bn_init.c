@@ -83,7 +83,6 @@ size_t bn_init_s(bn_t *number, char *string)
 	while(length > 0)
 	{
 		*res |= (*str - ASCII_ZERO) << shift;
-		printf("%x %c | ", *(ubyte *)res, *str);
 		shift -= straddval;
 		str += straddval;
 		--length;
