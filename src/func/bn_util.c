@@ -61,6 +61,7 @@ void bn_cpy(bn_t *result, bn_t *number)
 		bn_init(result, number->size);
 	else
 	{
+		/* Reallocate number to the right size */
 		ulong *tmp;
 		if ((tmp = realloc(result->num, number->size)) == NULL)
 			return;
@@ -216,8 +217,7 @@ void bn_srk(bn_t *number)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	ulong *num;
-	ulong tmp = 1;
+	ulong *num, tmp = 1;
 	byte add;
 	size_t size, old_size;
 
@@ -233,7 +233,7 @@ void bn_srk(bn_t *number)
 	}
 
 	old_size = size = number->size / sizeof(int);
-
+	
 	while (--size > 0)
 	{
 		if ((*num & INT_MAX) != 0)
@@ -241,7 +241,8 @@ void bn_srk(bn_t *number)
 
 		num += add;
 	}
-
+	
+	/* Resize number */
 	if (size != old_size)
 	{
 		bn_t tmp;
