@@ -263,74 +263,72 @@ void bn_sl(bn_t *number, ulong val)
 	if (number == NULL || number->num == NULL)
 		return;
 
-	ulong *num_end, *newnum_start, *newnum_end;
+	ulong *num_end, *newnum, *start, *end;
 	ulong tmp = 1, shift;
 	ubyte carry = 0;
 	byte inc;
 	size_t size;
 	
-	ulong *newnum = (ulong *)calloc(number->size/sizeof(ulong), sizeof(ulong));
+	/* Alocate new number for the byte shifting */
+	newnum = (val >= sizeof(ulong)*8) ? (ulong *)calloc(number->size/sizeof(ulong), sizeof(ulong)) : NULL;
 
 	/* Start from the higher value */
 	if(*(ubyte *)&tmp == 1) 		/* Little endian */
 	{
 		num_end = number->num + number->size/sizeof(ulong) - 1;
-		newnum_start = newnum;
-		newnum_end = newnum + number->size/sizeof(ulong) - 1;
+		start = (newnum != NULL) ? newnum : number->num;
+		end = ((newnum!= NULL) ? newnum : number-> num) + number->size/sizeof(ulong) - 1;
+		/* Endian dependent increment value */
 		inc = 1;
 	}
 	else							/* Big endian */
 	{
 		num_end = number->num;
-		newnum_start = newnum + number->size/sizeof(ulong) - 1;
-		newnum_end = newnum;
+		start = ((newnum != NULL) ? newnum : number->num) + number->size/sizeof(ulong) - 1; 
+		end = (newnum != NULL) ? newnum : number->num;
+		/* Endian dependent increment value */
 		inc = -1;
 	}
 
+	/* Full byte to be shifted */
 	shift = val/(sizeof(ulong)*8);
+	/* Rest bits to be shifted */
 	val -= shift*(sizeof(ulong)*8);
-	size = number->size/sizeof(ulong) - shift;
+	/* Bytes offset to be copyed */
 	num_end -= inc*shift;
-	
-	while(size > 0)
+
+	while(shift > 0)
 	{
-		*newnum_end = *num_end;
-		newnum_end -= inc;
+		*end = *num_end;
+		/* Decrement iterators */
+		end -= inc;
 		num_end -= inc;
-		--size;
+		--shift;
 	}
 
 	size = number->size/sizeof(ulong);
 	
 	while (size > 0 && val > 0)
 	{
-		tmp = (*newnum_start & (INT_MAX << val)) >> val;
-
-		*newnum_start <<= val;
-
-		if (carry != 0)
-			*newnum_start |= carry;
-
+		/* Store the carry for the next chunk */
+		tmp = (*start & (INT_MAX << val)) >> val;
+		/* Shift the chunk */
+		*start <<= val;
+		/* Insert carry bytes in the shifteed space */
+		*start |= carry;
+		/* Set carry for next round */
 		carry = tmp;
 		tmp = 0;
-
-		newnum_start += inc;
+		/* Increment iterators */
+		start += inc;
 		--size;
 	}
-
-	free(number->num);
-	number->num = newnum;
-}
-
-/**
- * 	@brief Shift number left by one bit and store the excess in output
- *	@param [in,out] output Initialized number
- *	@param [in] number Initialized number
- * 	@note Parameters need to have the same size
- */
-void bn_ssl(bn_t *output, bn_t *number)
-{
-
+	
+	if(newnum != NULL)
+	{
+		free(number->num);
+		number->num = newnum;
+	}
 }
 
 /**
@@ -339,17 +337,6 @@ void bn_ssl(bn_t *output, bn_t *number)
  * 	@note Require initialized number
  */
 void bn_sr(bn_t *number, ulong val)
-{
-
-}
-
-/**
- * 	@brief Shift number right by one bit and store the excess in output
- *	@param [in,out] output Initialized number
- *	@param [in] number Initialized number
- * 	@note Parameters need to have the same size
- */
-void bn_ssr(bn_t *output, bn_t *number)
 {
 
 }

@@ -19,13 +19,17 @@ int main()
 	puts("result2:");
 	bn_print(&result2);
 
-	bn_ext(&result2, 2);
+	bn_ext(&result, 2);
 	puts("result ext");
-	bn_print(&result2);
+	bn_print(&result);
 
-	bn_sl(&result2, 34);
+	bn_ncpy(&result, &result2, 8);
+	puts("result ncpy");
+	bn_print(&result);
+
+	bn_sl(&result, 6);
 	puts("result sl");
-	bn_print(&result2);
+	bn_print(&result);
 
 	/* Free memory */
 	bn_free(&result);
