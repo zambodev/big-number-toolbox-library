@@ -23,11 +23,11 @@ int main()
 	puts("result ext");
 	bn_print(&result);
 
-	bn_ncpy(&result, &result2, 8);
+	bn_ncpy(&result, &result2, 12);
 	puts("result ncpy");
 	bn_print(&result);
 
-	bn_sl(&result, sizeof(ulong)*8+4);
+	bn_sl(&result, sizeof(ulong)*2*8+4);
 	puts("result sl");
 	bn_print(&result);
 
