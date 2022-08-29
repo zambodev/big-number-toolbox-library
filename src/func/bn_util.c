@@ -284,13 +284,25 @@ void bn_sl(bn_t *number, ulong val)
 
 	/* Full byte to be shifted */
 	shift = val/(sizeof(ulong)*8);
-	/* Rest bits to be shifted */
-	val -= shift*(sizeof(ulong)*8);
-	/* Bytes offset to be copyed */
-	size = number->size/sizeof(ulong)-shift;
 	
 	if(shift > 0)
 	{
+		/* Rest bits to be shifted */
+		val -= shift*(sizeof(ulong)*8);
+		/* Bytes offset to be copyed */
+		size = number->size/sizeof(ulong);
+
+		if(size > shift)
+		{
+			size -= shift;
+			tmp = size;
+		}
+		else if(size <= shift)
+		{
+			tmp = size;
+			size = 0;
+		};
+
 		while(size > 0)
 		{
 			*end = *(end-(inc*shift));
@@ -299,11 +311,11 @@ void bn_sl(bn_t *number, ulong val)
 			end -= inc;
 			--size;
 		}
-		while(shift > 0)
+		while(tmp > 0)
 		{
 			*end = 0;
 			end -= inc;
-			--shift;
+			--tmp;
 		}
 	}
 

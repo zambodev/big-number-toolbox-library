@@ -36,7 +36,7 @@ int main()
 	bn_print(&result);
 	
 
-	bn_sl(&result, 2);
+	bn_sl(&result, 32*1+4);
 	puts("result sl");
 	bn_print(&result);
 
