@@ -324,7 +324,7 @@ void bn_sl(bn_t *number, ulong val)
 	while (size > 0 && val > 0)
 	{
 		/* Store the carry for the next chunk */
-		tmp = (*start & (ULONG_MAX >> (sizeof(ulong)*8-val)));
+		tmp = (*start & (ULONG_MAX << (sizeof(ulong)*8-val))) >> (sizeof(ulong)*8-val);
 		/* Shift the chunk */
 		*start <<= val;
 		/* Insert carry bytes in the shifteed space */
@@ -345,6 +345,83 @@ void bn_sl(bn_t *number, ulong val)
  */
 void bn_sr(bn_t *number, ulong val)
 {
+	if (number == NULL || number->num == NULL)
+		return;
+ 
+	ulong tmp = 1, carry = 0, shift, *start, *end;
+	byte inc;
+	size_t size;
+	
+	/* Start from the higher value */
+	if(*(ubyte *)&tmp == 1) 		/* Little endian */
+	{
+		start = number->num;
+		end = number->num + number->size/sizeof(ulong) - 1;
+		/* Endian dependent increment value */
+		inc = 1;
+	}
+	else							/* Big endian */
+	{
+		start = number->num  + number->size/sizeof(ulong) - 1;
+		end = number->num;
+		/* Endian dependent increment value */
+		inc = -1;
+	}
+
+	/* Full byte to be shifted */
+	shift = val/(sizeof(ulong)*8);
+	
+	if(shift > 0)
+	{
+		/* Rest bits to be shifted */
+		val -= shift*(sizeof(ulong)*8);
+		/* Bytes offset to be copyed */
+		size = number->size/sizeof(ulong);
+		
+		if(size > shift)
+		{
+			size -= shift;
+			tmp = shift;
+		}
+		else if(size <= shift)
+		{
+			tmp = size;
+			size = 0;
+		};
+
+		while(size > 0)
+		{
+			*start = *(start+(inc*shift));
+			
+			/* Decrement iterators */
+			start += inc;
+			--size;
+		}
+		while(tmp > 0)
+		{
+			*start = 0;
+			start += inc;
+			--tmp;
+		}
+	}
+
+	size = number->size/sizeof(ulong);
+
+	while (size > 0 && val > 0)
+	{
+		/* Store the carry for the next chunk */
+		tmp = (*end & (ULONG_MAX >> (sizeof(ulong)*8-val))) << (sizeof(ulong)*8-val);
+		/* Shift the chunk */
+		*end >>= val;
+		/* Insert carry bytes in the shifteed space */
+		*end |= carry;
+		
+		carry = tmp;
+		
+		tmp = 0;
+		end -= inc;
+		--size;
+	}
 
 }
 
