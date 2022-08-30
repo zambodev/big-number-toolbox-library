@@ -291,11 +291,11 @@ void bn_sl(bn_t *number, ulong val)
 		val -= shift*(sizeof(ulong)*8);
 		/* Bytes offset to be copyed */
 		size = number->size/sizeof(ulong);
-
+		
 		if(size > shift)
 		{
 			size -= shift;
-			tmp = size;
+			tmp = shift;
 		}
 		else if(size <= shift)
 		{
