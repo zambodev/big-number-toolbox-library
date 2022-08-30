@@ -14,7 +14,7 @@ Getting started:
 - Implement the feature
 - Push the code on your fork
 - Open a pull request
-- Attach a benchmark of the new code
+- Attach a benchmark of the new code and a scrupulous explanation of every implemented feature
 - Follow your pull request review and discussion
 
 *NOTES*:
