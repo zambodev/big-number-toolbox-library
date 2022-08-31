@@ -28,8 +28,7 @@ void bn_free(bn_t *number)
  */
 void bn_rev(bn_t *number)
 {
-	if (number == NULL || number->num == NULL)
-		return;
+	if (number->num == NULL) return;
 
 	ubyte *start = (ubyte *)number->num;
 	ubyte *end = (ubyte *)number->num + number->size - 1;
@@ -55,8 +54,7 @@ void bn_rev(bn_t *number)
  */
 void bn_cpy(bn_t *result, bn_t *number)
 {
-	if (result == NULL || number == NULL || number->num == NULL)
-		return;
+	if (number->num == NULL) return;
 	if (result->num == NULL)
 		bn_init(result, number->size);
 	else
@@ -93,8 +91,7 @@ void bn_cpy(bn_t *result, bn_t *number)
  */
 void bn_hcpy(bn_t *result, bn_t *number)
 {
-	if (result == NULL || number == NULL || number->num == NULL)
-		return;
+	if (number->num == NULL) return;
 	if (result->num == NULL)
 		bn_init(result, number->size);
 
@@ -143,8 +140,7 @@ void bn_hcpy(bn_t *result, bn_t *number)
  */
 void bn_ncpy(bn_t *result, bn_t *number, size_t size)
 {
-	if (result == NULL || number == NULL || number->num == NULL)
-		return;
+	if (number->num == NULL) return;
 	if (result->num == NULL)
 		bn_init(result, size);
 
@@ -194,8 +190,6 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
  */
 void bn_ext(bn_t *number, size_t bytes)
 {
-	if (number == NULL)
-		number = (bn_t *)malloc(sizeof(bn_t));
 	if (number->num == NULL)
 		bn_init(number, bytes);
 	else
@@ -434,36 +428,38 @@ void bn_sr(bn_t *number, ulong val)
  */
 void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 {
-	if(number1 == NULL && number2 == NULL)
-	{
-		*result = 0;
-		return;
-	}
-	else if(number1 == NULL)
-	{
-		*result = 1;
-		return;
-	}
-	else if(number2 == NULL)
-	{
-		*result = 2;
-		return;
-	}
-
 	size_t size1 = number1->size;
 	size_t size2 = number2->size;
+	ulong tmp = 1, *num1, *num2;
+	ubyte inc;
 
-	ubyte *num1 = (ubyte *)number1->num;
-	ubyte *num2 = (ubyte *)number2->num;
+	/* Start from the higher value */
+	if(*(ubyte *)&tmp == 1) 		/* Little endian */
+	{
+		num1 = number1->num + size1/sizeof(ulong) - 1;
+		num2 = number2->num + size2/sizeof(ulong) - 1;
+		/* Endian dependent increment value */
+		inc = -1;
+	}
+	else							/* Big endian */
+	{	
+		num1 = number1->num;
+		num2 = number2->num;
 
-	while ((size1--) > size2 && *(num1++) == 0)
-	{
+		/* Endian dependent increment value */
+		inc = 1;
 	}
-	size1++;
-	while (size1 < (size2--) && *(num2++) == 0)
+
+	while (*num1 == 0)
 	{
+		--size1;
+		num1 += inc;
 	}
-	size2++;
+	while (*num2 == 0)
+	{
+		--size2;
+		num2 += inc;
+	}
 
 	if (size1 > size2)
 	{
@@ -475,24 +471,24 @@ void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 		*result = 2;
 		return;
 	}
-
-	*result = 0;
-
+	
 	while (size1 > 0)
 	{
 		if (*num1 > *num2)
 		{
 			*result = 1;
-			break;
+			return;
 		}
 		else if (*num1 < *num2)
 		{
 			*result = 2;
-			break;
+			return;
 		}
 
-		num1++;
-		num2++;
-		size1--;
-	}
+		num1 += inc;
+		num2 += inc;
+		--size1;
+	}	
+
+	*result = 0;
 }
