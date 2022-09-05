@@ -78,7 +78,6 @@ void bn_sum(bn_t *number1, bn_t *number2)
 
 			*num1 = tmp;
 		}
-		printf("%lu\n", carry);
 
 		num1 += inc;
 		num2 += inc;
