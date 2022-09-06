@@ -24,7 +24,7 @@ TEST = $(BIN)/test
 all: dircheck $(LIBA)
 
 $(TEST): dircheck $(LIBA)
-	@ $(CC) $(CFLAGS) -o $@ $(MAIN) -l$(INCLIB) -I $(INC)/ -L $(LIB)/ -lpthread
+	@ $(CC) $(CFLAGS) -o $@ $(MAIN) -l$(INCLIB) -I $(INC)/ -L $(LIB)/
 
 # Create object files
 %.o: %.c
