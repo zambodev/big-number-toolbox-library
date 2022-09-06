@@ -47,9 +47,9 @@ typedef struct BN_T
 ################################
 */
 
-size_t bn_init(bn_t *number, size_t size);					/* Initialize n bytes and set them to 0 */
-size_t bn_init_n(bn_t *number, ulong value);
-size_t bn_init_s(bn_t *number, char *string);
+void bn_init(bn_t *number, size_t size);					/* Initialize n bytes and set them to 0 */
+void bn_init_n(bn_t *number, ulong value);
+void bn_init_s(bn_t *number, char *string);
 
 /*
 ################################

@@ -190,6 +190,7 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
  */
 void bn_ext(bn_t *number, size_t bytes)
 {
+	bytes += sizeof(ulong) - (bytes % sizeof(ulong));
 	if (number->num == NULL)
 		bn_init(number, bytes);
 	else
@@ -431,7 +432,7 @@ void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 	size_t size1 = number1->size;
 	size_t size2 = number2->size;
 	ulong tmp = 1, *num1, *num2;
-	ubyte inc;
+	byte inc;
 
 	/* Start from the higher value */
 	if(*(ubyte *)&tmp == 1) 		/* Little endian */

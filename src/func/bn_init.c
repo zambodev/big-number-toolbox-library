@@ -14,13 +14,11 @@
  *	@param [in,out] Number Allocated number
  *	@param [in] Size Size in bytes
 */
-size_t bn_init(bn_t *number, size_t size)
+void bn_init(bn_t *number, size_t size)
 {
 	size = (size % sizeof(ulong) == 0) ? size/sizeof(ulong) : size/sizeof(ulong)+1;
 	number->size = size * sizeof(ulong);
 	number->num = (size != 0) ? (ulong *)calloc(size, sizeof(ulong)) : NULL;
-
-	return number->size;
 }
 
 /**
@@ -28,13 +26,11 @@ size_t bn_init(bn_t *number, size_t size)
  *	@param [in,out] Number Allocated number
  *	@param [in] Number Value
 */
-size_t bn_init_n(bn_t *number, ulong value)
+void bn_init_n(bn_t *number, ulong value)
 {
 	number->size = sizeof(ulong);
 	number->num = (ulong *)calloc(1, sizeof(ulong));
 	*(number->num) |= value;
-
-	return number->size;
 }
 
 /**
@@ -42,57 +38,55 @@ size_t bn_init_n(bn_t *number, ulong value)
  *	@param [in,out] Number Allocated number
  *	@param [in] String Char* number
 */
-size_t bn_init_s(bn_t *number, char *string)
+void bn_init_s(bn_t *number, char *string)
 {
-	size_t length = strlen(string);
-	bn_init(number, (length-1) / 8);
+	char *ptr;
+	byte strinc, numinc;
+	ubyte *num, shift, count = 0;
+	ulong tmp = 1;
+	size_t len = strlen(string) - 1;
+	bn_init(number, len/8);
 
-	ulong tmp = 1;	
-	byte numaddval, straddval;
-	ubyte *res;
-	char *str;
-	ubyte shift;
-
-	if(*string == 'L')			/* Little endian */
+	if(*string == 'L')
 	{
-		str = string+1;
+		ptr = string + 1;
+		strinc = 1;
 		shift = 7;
-		straddval = 1;
-	}
-	else if(*string == 'B')		/* Big endian */
-	{
-		str = string+length-1;
-		shift = 0;
-		straddval = -1;
 	}
 	else
-		return 0;
-
-	if(*(ubyte *)&tmp == 1)		/* Little endian */
 	{
-		numaddval = 1;
-		res = (ubyte *)number->num;
-	}
-	else						/* Big endian */
-	{
-		numaddval = -1;
-		res = (ubyte *)number->num + number->size - 1;
+		ptr = string + len;
+		strinc = -1;
+		shift = 0;
 	}
 
-	--length;
-	while(length > 0)
+	if(*(ubyte *)&tmp == 1)			/* Little endian */
 	{
-		*res |= (*str - ASCII_ZERO) << shift;
-		shift -= straddval;
-		str += straddval;
-		--length;
+		num = (ubyte *)number->num;
+		numinc = 1;
+	}
+	else							/* Big endian */
+	{
+		num = (ubyte *)number->num + number->size - 1;
+		numinc = -1;
+	}
 
-		if((length) % 8 == 0)
-		{	
-			res += numaddval;
-			shift = (*string == 'L') ? 7 : 0;
+	while(len > 0)
+	{
+		*num |= (*ptr - ASCII_ZERO) << shift;
+		
+		shift -= strinc;
+		ptr += strinc;
+		++count;
+		--len;
+
+		if(count == 8)
+		{
+			shift = (strinc > 0) ? 7 : 0;
+			num += numinc;
+			count ^= count;
 		}
 	}
 
-	return number->size;
+
 }

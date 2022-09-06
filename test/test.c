@@ -16,26 +16,20 @@ ulong nanos()
 
 int main()
 {	
-	bn_t result, result2;
+	bn_t num1, num2;
 	ulong start = nanos();
 
 	ulong slstart = nanos();
-	printf("Allocated %d bytes\n", bn_init_s(&result, "L10000001000000000000000010000000"));
-	printf("Allocated %d bytes\n", bn_init_s(&result2, "L10001100001000000000000010000000"));
+	bn_init_s(&num1, "L10011110010");
+	bn_init_s(&num2, "B0000000001010101010100000000010111110101");
 	ulong slend = nanos();
 	
 	puts("result:");
-	bn_print(&result);
-	puts("result2:");
-	bn_print(&result2);
+	bn_print(&num1);
 
-	bn_ext(&result2, 4);
-	
-	ulong sumstart = nanos();
-	bn_sum(&result, &result2);
-	ulong sumend = nanos();
-	puts("result:");
-	bn_print(&result);
+	puts("result2:");
+	bn_print(&num2);
+
 
 	/*
 
@@ -61,15 +55,15 @@ int main()
 
 
 	/* Free memory */
-	bn_free(&result);
-	bn_free(&result2);
+	bn_free(&num1);
+	bn_free(&num2);
 
 	ulong end = nanos();
 
 	printf("Test duration: %lu\n", end-start);
 	printf("Allocation duration: %lu\n", slend-slstart);
 	//printf("Comparison duration: %lu\n", cend-cstart);
-	printf("Sum duration: %lu\n", sumend-sumstart);
+	//printf("Sum duration: %lu\n", sumend-sumstart);
 
 
 	printf("\n");
