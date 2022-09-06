@@ -20,16 +20,22 @@ int main()
 	ulong start = nanos();
 
 	ulong slstart = nanos();
-	bn_init_s(&num1, "L10011110010");
-	bn_init_s(&num2, "B0000000001010101010100000000010111110101");
+	bn_init_s(&num1, "B100000110000111100111100000001011100111111101010110101101001011011100100110101101011110101110110110110011000000100011011000110110010100011110011001111111001011100000100110100011010110111000010000001111010110110101110001011111010111000101111010100001100011");
+	bn_init_s(&num2, "B110001001000001011000111111101100011000000001111100010001110101110000011010010011101000010110101011011011110100000100011010111011001000000111011001011110000101000100011000011000111010100101111010010000001001000100101011001111000100101001101101011000101111");
 	ulong slend = nanos();
 	
-	puts("result:");
+	puts("num1:");
 	bn_print(&num1);
 
-	puts("result2:");
+	puts("num2:");
 	bn_print(&num2);
-
+	
+	ulong sumstart = nanos();
+	bn_sum(&num1, &num2);
+	ulong sumend = nanos();
+	puts("num1:");
+	bn_rev(&num1);
+	bn_print(&num1);
 
 	/*
 
@@ -63,7 +69,7 @@ int main()
 	printf("Test duration: %lu\n", end-start);
 	printf("Allocation duration: %lu\n", slend-slstart);
 	//printf("Comparison duration: %lu\n", cend-cstart);
-	//printf("Sum duration: %lu\n", sumend-sumstart);
+	printf("Sum duration: %lu\n", sumend-sumstart);
 
 
 	printf("\n");
