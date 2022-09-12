@@ -223,9 +223,9 @@ void bn_srk(bn_t *number)
 		#error "Unsupported architecture!"
 	#endif
 
-	old_size = size = number->size / sizeof(int);
+	old_size = size = number->size / sizeof(ulong);
 	
-	while (--size > 0)
+	while (--size > 1)
 	{
 		if ((*num & ULONG_MAX) != 0)
 			break;
