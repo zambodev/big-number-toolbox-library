@@ -1,6 +1,6 @@
 # ompiler settings
 CC = gcc -m32
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g 
 
 # Folders
 SRC = src
@@ -28,10 +28,10 @@ $(TEST): dircheck $(LIBA)
 
 # Create object files
 $(BUILD)/%.o: $(FUNC)/%.c
-	@echo -n 'Building object: '
+	@echo -n 'Building object $^: '
 	@ $(CC) -c $(CFLAGS) $^
 	@ mv *.o $(BUILD)
-	@echo done
+	@echo Done
 
 # Create static library archive
 $(LIBA): $(OBJS)
@@ -46,17 +46,17 @@ dircheck:
 ifeq ("$(wildcard $(BIN))", "")
 	@echo -n 'Creating bin/ folder: '
 	@ mkdir $(BIN)
-	@echo done
+	@echo Done
 endif
 ifeq ("$(wildcard $(BUILD))", "")
 	@echo -n 'Creating build/ folder: '
 	@ mkdir $(BUILD)
-	@echo done
+	@echo Done
 endif
 ifeq ("$(wildcard $(LIB))", "")
 	@echo -n 'Creating lib/ folder: '
 	@ mkdir $(LIB)
-	@echo done
+	@echo Done
 endif
 
 test: $(TEST)
