@@ -308,7 +308,7 @@ void bn_sl(bn_t *number, ulong val)
 
 	size = number->size/sizeof(ulong);
 
-	while (size > 0 && val > 0)
+	while(size > 0 && val > 0)
 	{
 		/* Store the carry for the next chunk */
 		tmp = (*start & (ULONG_MAX << (sizeof(ulong)*8-val))) >> (sizeof(ulong)*8-val);
@@ -390,7 +390,7 @@ void bn_sr(bn_t *number, ulong val)
 
 	size = number->size/sizeof(ulong);
 
-	while (size > 0 && val > 0)
+	while(size > 0 && val > 0)
 	{
 		/* Store the carry for the next chunk */
 		tmp = (*end & (ULONG_MAX >> (sizeof(ulong)*8-val))) << (sizeof(ulong)*8-val);
@@ -417,14 +417,14 @@ void bn_sr(bn_t *number, ulong val)
  */
 void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 {
-	size_t size1 = number1->size;
-	size_t size2 = number2->size;
+	size_t size1 = number1->size/sizeof(ulong);
+	size_t size2 = number2->size/sizeof(ulong);
 	ulong *num1, *num2;
 	byte inc;
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		num1 = number1->num + size1/sizeof(ulong) - 1;
-		num2 = number2->num + size2/sizeof(ulong) - 1;
+		num1 = number1->num + size1 - 1;
+		num2 = number2->num + size2 - 1;
 		inc = -1;
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
 		num1 = number1->num;
@@ -434,36 +434,36 @@ void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 		#error "Unsupported architecture!"
 	#endif
 
-	while (*num1 == 0)
+	while(*num1 == 0)
 	{
 		--size1;
 		num1 += inc;
 	}
-	while (*num2 == 0)
+	while(*num2 == 0)
 	{
 		--size2;
 		num2 += inc;
 	}
 
-	if (size1 > size2)
+	if(size1 > size2)
 	{
 		*result = 1;
 		return;
 	}
-	else if (size1 < size2)
+	else if(size1 < size2)
 	{
 		*result = 2;
 		return;
 	}
-	
-	while (size1 > 0)
+
+	while(size1 > 0)
 	{
-		if (*num1 > *num2)
+		if(*num1 > *num2)
 		{
 			*result = 1;
 			return;
 		}
-		else if (*num1 < *num2)
+		else if(*num1 < *num2)
 		{
 			*result = 2;
 			return;
