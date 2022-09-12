@@ -18,7 +18,7 @@ void bn_sum(bn_t *number1, bn_t *number2)
 {	
 	if(number1->num == NULL || number2->num == NULL) return;
 
-	ulong tmp = 1, carry = 0, shift, low, high, *num1, *num2;
+	ulong tmp = 0, carry = 0, shift, low, high, *num1, *num2;
 	byte inc;
 	size_t size1, size2;
 
@@ -42,20 +42,21 @@ void bn_sum(bn_t *number1, bn_t *number2)
 		#error "Unsupported architecture!"
 	#endif
 
-	tmp = 0;
 	low = ULONG_MAX >> shift;
 	high = ULONG_MAX << shift;
 
-	while(size1 > 0)
+	while(size1 > 0 && (size2 > 0 || carry != 0))
 	{
-		tmp = (*num1 & low) + (*num2 & low) + carry;
+		tmp = (size2 > 0) ? (*num2 & low) : 0;
+		tmp += (*num1 & low) + carry;
 		carry = (tmp & high) >> shift;
 
 		tmp ^= tmp & high;
 		*num1 ^= *num1 & low;
 		*num1 |= tmp;		
 
-		tmp = ((*num1 & high) >> shift) + ((*num2 & high) >> shift) + carry;			
+		tmp = (size2 > 0) ? ((*num2 & high) >> shift) : 0;
+		tmp += ((*num1 & high) >> shift) + carry;			
 
 		carry = (tmp & high) >> shift;
 
@@ -64,9 +65,13 @@ void bn_sum(bn_t *number1, bn_t *number2)
 		*num1 |= tmp;	
 
 		num1 += inc;
-		num2 += inc;
 		--size1;
-		
+		if(size2 > 0)
+		{
+			num2 += inc;
+			--size2;
+		}
+
 		if(size1 == 0 && carry != 0)
 		{
 			bn_ext(number1, sizeof(ulong));
