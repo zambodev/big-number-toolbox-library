@@ -1,5 +1,5 @@
 # ompiler settings
-CC = gcc -m32
+CC = gcc
 CFLAGS = -Wall -g 
 
 # Folders
@@ -21,17 +21,28 @@ OBJS := $(addprefix $(BUILD)/, $(notdir $(SRCS:.c=.o)))
 # Executables
 TEST = $(BIN)/test
 
-all: dircheck $(LIBA)
+# Architecture
+ARCH = $(shell uname -m)
+
+# Aesthetics
+GREEN = \033[0;32m
+RESET = \033[0m
+
+all: archinfo dircheck $(LIBA)
 
 $(TEST): dircheck $(LIBA)
 	@ $(CC) $(CFLAGS) -o $@ $(MAIN) -l$(INCLIB) -I $(INC)/ -L $(LIB)/ -lpthread
+
+# Architecture info
+archinfo:
+	@echo 'Building on $(ARCH) architecture'
 
 # Create object files
 $(BUILD)/%.o: $(FUNC)/%.c
 	@echo -n 'Building object $^: '
 	@ $(CC) -c $(CFLAGS) $^
 	@ mv *.o $(BUILD)
-	@echo Done
+	@echo -e '	$(GREEN)Done$(RESET)'
 
 # Create static library archive
 $(LIBA): $(OBJS)
@@ -39,24 +50,24 @@ $(LIBA): $(OBJS)
 	@ ar -rcs $@ $(BUILD)/*
 	@ cp -p *.a $(LIB)/
 	@ rm *.a
-	@echo Done
+	@echo -e '	$(GREEN)Done$(RESET)'
 
 # Check if all needed directory exists, if not, creates it
 dircheck:
 ifeq ("$(wildcard $(BIN))", "")
 	@echo -n 'Creating bin/ folder: '
 	@ mkdir $(BIN)
-	@echo Done
+	@echo -e '			$(GREEN)Done$(RESET)'
 endif
 ifeq ("$(wildcard $(BUILD))", "")
 	@echo -n 'Creating build/ folder: '
 	@ mkdir $(BUILD)
-	@echo Done
+	@echo -e '		$(GREEN)Done$(RESET)'
 endif
 ifeq ("$(wildcard $(LIB))", "")
 	@echo -n 'Creating lib/ folder: '
 	@ mkdir $(LIB)
-	@echo Done
+	@echo -e '			$(GREEN)Done$(RESET)'
 endif
 
 test: $(TEST)
