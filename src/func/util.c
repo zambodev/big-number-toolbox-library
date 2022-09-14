@@ -189,7 +189,7 @@ void bn_ext(bn_t *number, size_t bytes)
 {
 	ulong mod = bytes % sizeof(ulong);
 	bytes += (mod == 0) ? 0 : sizeof(ulong) - mod;
-	printf("ext of: %lu\n", bytes);
+
 	if (number->num == NULL)
 		bn_init(number, bytes);
 	else
