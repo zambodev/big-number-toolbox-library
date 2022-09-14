@@ -14,32 +14,39 @@ ulong nanos()
 
 int main()
 {	
-	bn_t num1, num2, num3, sum_check;
+	bn_t num1, num2, sum_check = {0};
 	ulong start = nanos();
 
 	ulong slstart = nanos();
 	bn_init_s(&num1, "B100000110000111100111100000001011100111111101010110101101001011011100100110101101011110101110110110110011000000100011011000110110010100011110011001111111001011100000100110100011010110111000010000001111010110110101110001011111010111000101111010100001100011");
 	bn_init_s(&num2, "B110001001000001011000111111101100011000000001111100010001110101110000011010010011101000010110101011011011110100000100011010111011001000000111011001011110000101000100011000011000111010100101111010010000001001000100101011001111000100101001101101011000101111");
-	bn_init_s(&sum_check, "B1010001111001001000000011111110111111111111111010010111111000001001101000001000001000111000101100010001110110100100111110011110001011100100101110011011101010000100100111110111100010001011110001010011111011111111010011100101110011011101111100111111010010010");	
-	bn_init_s(&num3, "B000000000000000000000000000000000000000000000000000000000000000");
+	bn_cpy(&sum_check, &num1);
 	ulong slend = nanos();
 	
 	puts("num1:");
+	printf("Size: %lu\n", num1.size);
 	bn_print(&num1);
 
 	puts("num2:");
+	printf("Size: %lu\n", num2.size);
 	bn_print(&num2);
 
-	puts("num3:");
-	bn_print(&num3);
-
 	puts("sum_check:");
+	printf("Size: %lu\n", sum_check.size);
 	bn_print(&sum_check);
 
 	ulong sumstart = nanos();
 	bn_sum(&num1, &num2);
 	ulong sumend = nanos();
 	puts("after sum num1:");
+	printf("Size: %lu\n", num1.size);
+	bn_print(&num1);
+
+	ulong substart = nanos();
+	bn_sub(&num1, &num2);
+	ulong subend = nanos();
+	puts("after sub num1:");
+	printf("Size: %lu\n", num1.size);
 	bn_print(&num1);
 
 	ubyte check;
@@ -48,11 +55,6 @@ int main()
 		puts("Numbers are equal!");
 	else
 		puts("Numbers are not equal!");
-
-	bn_srk(&num3);
-
-	puts("srk num3:");
-	bn_print(&num3);
 
 	/*
 	bn_ncpy(&result, &result2, 16);
@@ -85,8 +87,8 @@ int main()
 	printf("Test duration: %lu\n", end-start);
 	printf("Allocation duration: %lu\n", slend-slstart);
 	//printf("Comparison duration: %lu\n", cend-cstart);
-		printf("Sum duration: %lu\n", sumend-sumstart);
-
+	printf("Sum duration: %lu\n", sumend-sumstart);
+	printf("Sub duration: %lu\n", subend-substart);
 
 	printf("\n");
 	return EXIT_SUCCESS;
