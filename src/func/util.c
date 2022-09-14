@@ -57,7 +57,7 @@ void bn_cpy(bn_t *result, bn_t *number)
 	if (number->num == NULL) return;
 	if (result->num == NULL)
 		bn_init(result, number->size);
-	else
+	else if(result->size != number->size)
 	{
 		/* Reallocate number to the right size */
 		ulong *tmp;
@@ -187,7 +187,9 @@ void bn_ncpy(bn_t *result, bn_t *number, size_t size)
  */
 void bn_ext(bn_t *number, size_t bytes)
 {
-	bytes += sizeof(ulong) - (bytes % sizeof(ulong));
+	ulong mod = bytes % sizeof(ulong);
+	bytes += (mod == 0) ? 0 : sizeof(ulong) - mod;
+	printf("ext of: %lu\n", bytes);
 	if (number->num == NULL)
 		bn_init(number, bytes);
 	else
