@@ -20,7 +20,7 @@ int main()
 	ulong start = nanos();
 
 	bn_init_s(&num1, "B110001001000001011000111111101100011000000001111100010001110101110000011010010011101000010110101011011011110100000100011010111011001000000111011001011110000101000100011000011000111010100101111010010000001001000100101011001111000100101001101101011000101111");
-	bn_init(&num2, 32);
+	bn_init(&num2, 56);
 	bn_init(&sum_check, num2.size);
 	
 	puts("num1:");
@@ -44,8 +44,11 @@ int main()
 
 	/* Free memory */
 	bn_free(&num1);
+	puts("free num1");
 	bn_free(&num2);
+	puts("free num2");
 	bn_free(&sum_check);
+	puts("free sum");
 	free(t);
 
 	ulong end = nanos();

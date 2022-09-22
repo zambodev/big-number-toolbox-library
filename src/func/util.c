@@ -218,7 +218,7 @@ void bn_sl(bn_t *destn, bn_t *source, ulong val)
  
 	ulong tmp, carry = 0, shift, *src, *dst_st, *dst_end;
 	byte inc;
-	size_t size, size2;
+	size_t size1, size2;
 	
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
 		src = source->num + source->size/sizeof(ulong) - 1;
@@ -236,51 +236,45 @@ void bn_sl(bn_t *destn, bn_t *source, ulong val)
 
 	/* Full byte to be shifted */
 	shift = val/(sizeof(ulong)*8);
-	size2 = (destn->size - source->size)/sizeof(ulong);
 
 	if(shift > 0)
 	{
 		/* Rest bits to be shifted */
 		val -= shift*(sizeof(ulong)*8);
 		/* Bytes offset to be copyed */
-		size = source->size/sizeof(ulong);
-		
-		if(size > shift)
-		{
-			size -= shift;
-			tmp = shift;
-		}
-		else if(size <= shift)
-		{
-			tmp = size;
-			size = 0;
-		};
+		size1 = source->size/sizeof(ulong);
+		size2 = destn->size/sizeof(ulong);
 
-		while(size > 0)
+		if(size2 > size1+shift)
 		{
-			
-			*dst_end = *(src-(inc*(shift-size2)));
-			/* Decrement iterators */
-			dst_end -= inc;
-			if(size2 > 0) 
-				--size2;
-			else 
-			{
-				++shift;
-				--size;
-			}
+			dst_end -= inc*(size2-(size1+shift));
+			size2 -= size2-(size1+shift);
 		}
-		while(tmp > 0)
+		else
+		{
+			size1 -= shift;
+			src -= inc*shift;
+		}
+		
+		while(size1 > 0)
+		{
+			*dst_end = *src;
+			src -= inc;
+			dst_end -= inc;
+			--size1;
+			--size2;
+		}
+		while(size2 > 0)
 		{
 			*dst_end = 0;
 			dst_end -= inc;
-			--tmp;
+			--size2;
 		}
 	}
+	
+	size2 = destn->size/sizeof(ulong);
 
-	size = source->size/sizeof(ulong);
-
-	while(size > 0 && val > 0)
+	while(size2 > 0 && val > 0)
 	{
 		tmp = (*dst_st & (ULONG_MAX << (sizeof(ulong)*8-val))) >> (sizeof(ulong)*8-val);
 		*dst_st <<= val;
@@ -290,7 +284,7 @@ void bn_sl(bn_t *destn, bn_t *source, ulong val)
 		
 		tmp = 0;
 		dst_st += inc;
-		--size;
+		--size2;
 	}
 }
 
