@@ -27,11 +27,12 @@ int main()
 	bn_print(&num1);
 
 	ulong sumstart = nanos();
-	bn_add(&num1, &num1, &num2);
-	ulong sumend = nanos;
+	bn_add(&sum_check, &num1, &num2);
+	bn_sub(&sum_check, &num2);
+	ulong sumend = nanos();
 
 	printf("Num1:\nSize: %lu\n", num1.size);
-	bn_print(&num1);
+	bn_print(&sum_check);
 
 	/* Free memory */
 	bn_free(&num1);

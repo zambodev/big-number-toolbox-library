@@ -16,16 +16,17 @@
 */
 void bn_add(bn_t *destn, bn_t *number1, bn_t *number2)
 {	
-	if(number1->num == NULL || number2->num == NULL) return;
+	if(number1->size == 0 || number2->size == 0) return;
 
 	ulong tmp = 0, carry = 0, shift, low, high, *dst, *num1, *num2;
 	byte inc;
-	size_t size1, size2;
+	size_t size, size1, size2;
 
 	/* Extends result if allocated space isn't enough */
-	if(number1->size < number2->size)
-		bn_ext(number1, number1, number2->size - number1->size);
+	if(destn->size < number2->size)
+		bn_ext(destn, destn, number2->size - destn->size);
 
+	size = destn->size/sizeof(ulong);
 	size1 = number1->size/sizeof(ulong);
 	size2 = number2->size/sizeof(ulong);
 	shift = sizeof(ulong)*8/2;
@@ -38,7 +39,7 @@ void bn_add(bn_t *destn, bn_t *number1, bn_t *number2)
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
 		num1 = number1->num + size1 - 1;
 		num2 = number2->num + size2 - 1;
-		dst = destn->num + destn->size - 1;
+		dst = destn->num + size - 1;
 		inc = -1;
 	#else
 		#error "Unsupported architecture!"
@@ -67,17 +68,20 @@ void bn_add(bn_t *destn, bn_t *number1, bn_t *number2)
 		*dst |= tmp;	
 
 		num1 += inc;
+		dst += inc;
 		--size1;
+		--size;
+
 		if(size2 > 0)
 		{
 			num2 += inc;
 			--size2;
 		}
 
-		if(size1 == 0 && carry != 0)
+		if(size == 0 && carry != 0)
 		{
-			bn_ext(number1, number1, sizeof(ulong));
-			size1 += sizeof(ulong);
+			bn_ext(destn, destn, sizeof(ulong));
+			size += sizeof(ulong);
 		}
 	}
 
