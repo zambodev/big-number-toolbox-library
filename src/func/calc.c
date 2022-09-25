@@ -130,6 +130,48 @@ void bn_sub(bn_t *destn, bn_t *number1, bn_t *number2)
 	low = ULONG_MAX >> shift;
 	high = ULONG_MAX << shift;
 
+	while(size1 > 0 && (size2 > 0 || carry != 0))
+	{
+		store = (size2 > 0) ? ~(*num2) : 0;
+		tmp = (store & low) + carry;
+		carry = (tmp & high) >> shift;
+		store ^= store & low;
+		store |= tmp & low;;	
+
+		tmp = ((store & high) >> shift);
+		tmp += carry;
+		carry = (tmp & high) >> shift;
+
+		tmp <<= shift;
+		store ^= store & high;
+		store |= tmp;
+
+		tmp = (*num1 & low);
+		tmp += (store & low) + carry2;
+		carry2 = (tmp & high) >> shift;
+		*dst ^= *dst & low;
+		*dst |= tmp & low;
+
+		tmp = (*num1 & high) >> shift;
+		tmp += ((store & high) >> shift) + carry2;
+
+		carry2 = (tmp & high) >> shift;
+		tmp <<= shift;
+
+		*dst ^= *dst & high;
+		*dst |= tmp;
+
+		num1 += inc;
+		dst += inc;
+		--size1;
+		--size;
+		if(size2 > 0)
+		{
+			num2 += inc;
+			--size2;
+		}
+	}
+
 }
 
 
