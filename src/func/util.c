@@ -157,6 +157,25 @@ void bn_rev(bn_t *destn, bn_t *source)
 	}
 }
 
+/* Flip all bits */
+void bn_flip(bn_t *destn, bn_t *source)
+{
+	if(source->size == 0 || destn->size == 0) return;
+	if(destn->size != source->size) return;
+
+	ulong *dst = destn->num; 
+	ulong *src = source->num;
+	size_t size = source->size/sizeof(ulong);
+	
+	while(size > 0)
+	{
+		*dst = ~(*src);
+		++dst;
+		++src;
+		--size;
+	}
+}
+
 /* Extend a source by n bytes */
 void bn_ext(bn_t *destn, bn_t *source, size_t bytes)
 {
