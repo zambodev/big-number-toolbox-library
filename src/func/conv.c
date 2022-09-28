@@ -1,20 +1,7 @@
-/**
- * @file bn_conv.c
- * @brief Convert big numbers to and from string
- * @author Zambo-dev
- * @date 22/12/2021
- * @copyright Zambo-dev - 2022 | licensed under MIT
-*/
-
-
 #include "../include/bntl.h"
 
 
-/**
- *	@brief Convert a bn_t number into a string
- *	@param [in] number Initialized number
- *	@return char* string
-*/
+/* Convert a number into a string */
 char* bntobs(bn_t *number)
 {	
 	char* result = (char*) malloc(number->size*8+1);

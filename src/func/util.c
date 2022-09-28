@@ -326,11 +326,7 @@ void bn_sl(bn_t *destn, bn_t *source, ulong val)
 	}
 }
 
-/**
- * 	@brief Shift value right by one bit
- *	@param [in,out] number Initialized number
- * 	@note Require initialized number
- */
+/* Shift value right by val bits */
 void bn_sr(bn_t *destn, bn_t *source, ulong val)
 {
 	if(source->size == 0 || destn->size == 0) return;
@@ -426,13 +422,7 @@ void bn_sr(bn_t *destn, bn_t *source, ulong val)
 	}
 }
 
-/**
- * 	@brief Compare two numbers
- *	@param [in] number1 Initialized number
- *	@param [in] number2 Initialized number
- *	@param [in,out] result Single byte initialized
- * 	@note If they're equal result is set to 0, if number1 is greater, result is set to 1, if number2 is greater, result is set to 2
- */
+/* Compare two numbers 0 = equals, 1 = first bigger, 2 = second bigger*/
 void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 {
 	size_t size1 = number1->size/sizeof(ulong);
