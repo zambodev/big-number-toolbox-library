@@ -1,19 +1,7 @@
-/** 
- * @file bn_print.c
- * @brief Print big number value
- * @author Zambo-dev
- * @date 22/12/2021
- * @copyright Zambo-dev - 2022 | licensed under MIT
-*/
-
-
 #include "../include/bntl.h"
 
 
-/**
- * 	@brief Print a bn_t number into stdout formatting in (rows of 8, space seprarated, bytes)
- *	@param [in,out] number Initialized number
-*/
+/* Print a number into stdout formatting in (rows of 8, space seprarated, bytes) */
 void bn_print(bn_t *number)
 {
 	ulong tmp = 1;
