@@ -1,422 +1,428 @@
-/**
- * @file bn_util.c
- * @brief Utility functions for handling big numbers
- * @author Zambo-dev
- * @date 22/12/2021
- * @copyright Zambo-dev - 2022 | licensed under MIT
- */
-
 #include "../include/bntl.h"
 
-/**
- * 	@brief Free number's memory
- *	@param [in,out] number Initialized number
- */
+
+/* Free number */
 void bn_free(bn_t *number)
 {
-	if (number->num != NULL)
+	if(number->size != 0)
 	{
 		free(number->num);
 		number->num = NULL;
-	}
-	number->size = 0;
-}
-
-/**
- *	@brief Revers number's bytes
- *	@param [in,out] number Initialized number
- */
-void bn_rev(bn_t *number)
-{
-	if (number->num == NULL) return;
-
-	ubyte *start = (ubyte *)number->num;
-	ubyte *end = (ubyte *)number->num + number->size - 1;
-	ubyte tmp;
-	size_t size = number->size / 2;
-
-	while (size > 0)
-	{
-		tmp = *start;
-		*start = *end;
-		*end = tmp;
-
-		++start;
-		--end;
-		--size;
+		number->size = 0;
 	}
 }
 
-/**
- * 	@brief Copy value from number to result reallocating result memory
- *	@param [in,out] result Initialized number
- *	@param [in] number Initialized number
- */
-void bn_cpy(bn_t *result, bn_t *number)
+/* Copy source into destination */
+void bn_cpy(bn_t *destn, bn_t *source)
 {
-	if (number->num == NULL) return;
-	if (result->num == NULL)
-		bn_init(result, number->size);
-	else if(result->size != number->size)
+	if(source->size == 0) return;
+	if(destn->size == 0)
+		bn_init(destn, source->size);
+	else if(destn->size != source->size)
 	{
 		/* Reallocate number to the right size */
 		ulong *tmp;
-		if ((tmp = realloc(result->num, number->size)) == NULL)
+		if((tmp = realloc(destn->num, source->size)) == NULL)
 			return;
 
-		result->num = tmp;
-		result->size = number->size;
+		destn->num = tmp;
+		destn->size = source->size;
 	}
 
-	size_t size = number->size;
+	size_t size = source->size;
 
-	ulong *res = result->num;
-	ulong *num = number->num;
+	ulong *dst = destn->num;
+	ulong *src = source->num;
 	size /= sizeof(ulong);
 
-	while (size > 0)
+	while(size > 0)
 	{
-		*res = *num;
-		++res;
-		++num;
+		*dst = *src;
+		++dst;
+		++src;
 		--size;
 	}
 }
 
-/**
- * 	@brief Copy value from number to result not reallocating result memory
- *	@param [in,out] result Initialized number
- *	@param [in] number Initialized number
- * 	@note Result can either be bigger or smaller than number, if is bigger the spare is set to 0, if is smaller only the available bytes are set
- */
-void bn_hcpy(bn_t *result, bn_t *number)
+/* Copy value from source to destination not reallocating destinatino memory */
+void bn_hcpy(bn_t *destn, bn_t *source)
 {
-	if (number->num == NULL) return;
-	if (result->num == NULL)
-		bn_init(result, number->size);
+	if(source->size == 0) return;
+	if(destn->size == 0)
+		bn_init(destn, source->size);
 
-	ubyte *res, *num;
+	ubyte *dst, *src;
 	byte inc;
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		res = (ubyte *)result->num;
-		num = (ubyte *)number->num;
+		dst = (ubyte *)destn->num;
+		src = (ubyte *)source->num;
 		inc = 1;
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
-		res = (ubyte *)result->num + result->size - 1;
-		num = (ubyte *)number->num + number->size - 1;
+		dst = (ubyte *)destn->num + destn->size - 1;
+		src = (ubyte *)source->num + source->size - 1;
 		inc = -1;
 	#else
 		#error "Unsupported architecture!"
 	#endif
 
 
-	size_t num_size = number->size;
-	size_t res_size = result->size;
+	size_t src_size = source->size;
+	size_t dst_size = destn->size;
 
-	while (num_size > 0 && res_size > 0)
+	while(src_size > 0 && dst_size > 0)
 	{
-		*res = *num;
-		res += inc;
-		num += inc;
-		--num_size;
-		--res_size;
+		*dst = *src;
+		dst += inc;
+		src += inc;
+		--src_size;
+		--dst_size;
 	}
 
-	while (res_size > 0)
+	while(dst_size > 0)
 	{
-		*res = 0;
-		res += inc;
-		--res_size;
+		*dst = 0;
+		dst += inc;
+		--dst_size;
 	}
 }
 
-/**
- * 	@brief Copy n bytes of value from number to result
- *	@param [in,out] result Initialized number
- *	@param [in] number Initialized number
- *	@param [in] size Byte size
- */
-void bn_ncpy(bn_t *result, bn_t *number, size_t size)
+/* Copy n bytes of value from source to destination */
+void bn_ncpy(bn_t *destn, bn_t *source, size_t size)
 {
-	if (number->num == NULL) return;
-	if (result->num == NULL)
-		bn_init(result, size);
+	if(source->size == 0) return;
+	if(destn->size ==0)
+		bn_init(destn, size);
 
-	ubyte *res, *num;
+	ubyte *dst, *src;
 	byte inc;
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		res = (ubyte *)result->num;
-		num = (ubyte *)number->num;
+		dst = (ubyte *)destn->num;
+		src = (ubyte *)source->num;
 		inc = 1;
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
-		res = (ubyte *)result->num + result->size - 1;
-		num = (ubyte *)number->num + number->size - 1;
+		dst = (ubyte *)destn->num + destn->size - 1;
+		src = (ubyte *)source->num + source->size - 1;
 		inc = -1;
 	#else
 		#error "Unsupported architecture!"
 	#endif
 
-	size_t res_size = result->size;
-	if(size > number->size)
-		size = (number->size > res_size) ? res_size : number->size;
+	size_t dst_size = destn->size;
+	if(size > source->size)
+		size = (source->size > dst_size) ? dst_size : source->size;
 
-	while (size > 0)
+	while(size > 0)
 	{
-		*res = *num;
-		res += inc;
-		num += inc;
+		*dst = *src;
+		dst += inc;
+		src += inc;
 		--size;
-		--res_size;
+		--dst_size;
 	}
 
-	while (res_size > 0)
+	while(dst_size > 0)
 	{
-		*res = 0;
-		res += inc;
-		--res_size;
+		*dst = 0;
+		dst += inc;
+		--dst_size;
 	}
 }
 
-/**
- * 	@brief Extend a number by n bytes
- *	@param [in,out] result Initialized number
- *	@param [in] number Initialized number
- *	@param [in] size Byte size
- */
-void bn_ext(bn_t *number, size_t bytes)
+/* Reverse bytes order */
+void bn_rev(bn_t *destn, bn_t *source)
 {
+	if(source->size == 0 || destn->size == 0) return;
+	if(destn->size != source->size) return;
+
+	ubyte *src_st = (ubyte *)source->num;
+	ubyte *src_end = (ubyte *)source->num + source->size - 1;
+	ubyte *dst_st = (ubyte *)destn->num;
+	ubyte *dst_end = (ubyte *)destn->num + destn->size - 1;
+	ubyte tmp;
+	size_t size = source->size / 2;
+
+	while(size > 0)
+	{
+		tmp = *src_st;
+		*dst_st = *src_end;
+		*dst_end = tmp;
+	
+		++src_st;
+		--src_end;
+		++dst_st;
+		--dst_end;
+		--size;
+	}
+}
+
+/* Flip all bits */
+void bn_flip(bn_t *destn, bn_t *source)
+{
+	if(source->size == 0 || destn->size == 0) return;
+	if(destn->size != source->size) return;
+
+	ulong *dst = destn->num; 
+	ulong *src = source->num;
+	size_t size = source->size/sizeof(ulong);
+	
+	while(size > 0)
+	{
+		*dst = ~(*src);
+		++dst;
+		++src;
+		--size;
+	}
+}
+
+/* Extend a source by n bytes */
+void bn_ext(bn_t *destn, bn_t *source, size_t bytes)
+{
+	if(source->size == 0) return;
+
 	ulong mod = bytes % sizeof(ulong);
 	bytes += (mod == 0) ? 0 : sizeof(ulong) - mod;
 
-	if (number->num == NULL)
-		bn_init(number, bytes);
-	else
-	{
-		bn_t tmp;
-		bn_init(&tmp, number->size + bytes);
-		bn_hcpy(&tmp, number);
-		bn_cpy(number, &tmp);
-		bn_free(&tmp);
-	}
+	bn_t tmp;
+	bn_init(&tmp, source->size + bytes);
+	bn_hcpy(&tmp, source);
+	bn_cpy(destn, &tmp);
+	bn_free(&tmp);
 }
 
-/**
- * 	@brief Shrink unused bytes in front of the value
- *	@param [in,out] number Initialized number
- */
-void bn_srk(bn_t *number)
+/* Shrink unused bytes in front of the value */
+void bn_srk(bn_t *destn, bn_t *source)
 {
-	if (number->num == NULL)
-		return;
+	if(source->size == 0) return;
 
-	ulong *num;
-	byte add;
+	ulong *src;
+	byte inc;
 	size_t size, old_size;
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		num = number->num;
-		add = 1;
+		src = source->num + source->size/sizeof(ulong) - 1;
+		inc = -1;
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
-		num = number->num + number->size - 1;
-		add = -1;
+		src = source->num;
+		inc = 1;
 	#else
 		#error "Unsupported architecture!"
 	#endif
 
-	old_size = size = number->size / sizeof(ulong);
+	old_size = size = source->size;
 	
-	while (--size > 1)
-	{
-		if ((*num & ULONG_MAX) != 0)
-			break;
-
-		num += add;
+	while(size > sizeof(ulong))
+	{	
+		if((*src & ULONG_MAX) != 0) break;
+		src += inc;
+		size -= sizeof(ulong);
 	}
-	
+
 	/* Resize number */
-	if (size != old_size)
+	if(size != old_size)
 	{ 
 		bn_t tmp;
 		bn_init(&tmp, size);
-		bn_ncpy(&tmp, number, size);
-		bn_cpy(number, &tmp);
+		bn_ncpy(&tmp, source, size);
+		bn_cpy(destn, &tmp);
 		bn_free(&tmp);
 	}
 }
 
-/**
- * 	@brief Shift value left by one bit
- *	@param [in,out] number Initialized number
- */
-void bn_sl(bn_t *number, ulong val)
+/* Shift value left by one bit */
+void bn_sl(bn_t *destn, bn_t *source, ulong val)
 {
-	if (number == NULL || number->num == NULL)
-		return;
+	if(source->size == 0 || destn->size == 0) return;
  
-	ulong tmp, carry = 0, shift, *start, *end;
+	ulong tmp, carry = 0, shift, *src, *dst_st, *dst_end;
 	byte inc;
-	size_t size;
+	size_t size1, size2;
 	
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		start = number->num;
-		end = number->num + number->size/sizeof(ulong) - 1;
+		src = source->num + source->size/sizeof(ulong) - 1;
+		dst_end = destn->num + destn->size/sizeof(ulong) - 1;
+		dst_st = destn->num;
 		inc = 1;
 	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
-		start = number->num  + number->size/sizeof(ulong) - 1;
-		end = number->num;
+		src = source->num;
+		dst_st = destn->num + destn->size/sizeof(ulong) - 1;
+		dst_end = destn->num;
 		inc = -1;
 	#else
 		#error "Unsupported architecture!"
 	#endif
 
-	/* Full byte to be shifted */
+	/* Set numbers size */
+	size1 = source->size/sizeof(ulong);
+	size2 = destn->size/sizeof(ulong);
+	/* Set full byte chunks shift */
 	shift = val/(sizeof(ulong)*8);
-	
-	if(shift > 0)
-	{
-		/* Rest bits to be shifted */
-		val -= shift*(sizeof(ulong)*8);
-		/* Bytes offset to be copyed */
-		size = number->size/sizeof(ulong);
-		
-		if(size > shift)
-		{
-			size -= shift;
-			tmp = shift;
-		}
-		else if(size <= shift)
-		{
-			tmp = size;
-			size = 0;
-		};
+	if(shift > size2) shift = size2;
+	/* Set val to remaining bits to shift */
+	val -= shift*(sizeof(ulong)*8);
 
-		while(size > 0)
+	/* Check for size cases 
+	* If the two sizes are equal shift the source end to ignore cut off chunks
+	* If the destination is bigger shift the destn end to ignore useless chunks 
+	* and if the shift will overflow anyway shift the source end to ignore cut off chunks
+	*/
+	if(size2 == size1)
+	{
+		size1 -= shift;
+		src -= inc*shift;
+	}
+	else
+	{
+		tmp = size1+shift;
+		if(size2 < tmp)
 		{
-			*end = *(end-(inc*shift));
-			
-			/* Decrement iterators */
-			end -= inc;
-			--size;
+			src -= (tmp-size2);
+			size1 -= (tmp-size2);
+			tmp = size2;
 		}
-		while(tmp > 0)
-		{
-			*end = 0;
-			end -= inc;
-			--tmp;
-		}
+
+		dst_end -= inc*(size2-tmp);
+		size2 -= size2-tmp;
 	}
 
-	size = number->size/sizeof(ulong);
-
-	while(size > 0 && val > 0)
+	/* Shift chunk into new position */
+	while(size1 > 0)
 	{
-		/* Store the carry for the next chunk */
-		tmp = (*start & (ULONG_MAX << (sizeof(ulong)*8-val))) >> (sizeof(ulong)*8-val);
-		/* Shift the chunk */
-		*start <<= val;
-		/* Insert carry bytes in the shifteed space */
-		*start |= carry;
-		
-		carry = tmp;
-		
+		*dst_end = *src;
+	
+		src -= inc;
+		dst_end -= inc;
+		--size1;
+		--size2;
+	}
+	/* Set remaining bytes to 0 */
+	while(size2 > 0)
+	{
+		*dst_end = 0;
+
+		dst_end -= inc;
+		--size2;
+	}
+	
+	/* Restore size for a new loop */
+	size2 = destn->size/sizeof(ulong);	
+
+	/* Shift remaining bits */
+	while(size2 > 0 && val > 0)
+	{
+		/* Store in tmp the carryf or the next chunk of bytes */
+		tmp = (*dst_st & (ULONG_MAX << (sizeof(ulong)*8-val))) >> (sizeof(ulong)*8-val);
+		/* Shift the value */
+		*dst_st <<= val;
+		/* Insert the carry */
+		*dst_st |= carry;
+		/* Set carry for the next chunk */
+		carry = tmp;	
 		tmp = 0;
-		start += inc;
-		--size;
+		
+		dst_st += inc;
+		--size2;
 	}
 }
 
-/**
- * 	@brief Shift value right by one bit
- *	@param [in,out] number Initialized number
- * 	@note Require initialized number
- */
-void bn_sr(bn_t *number, ulong val)
+/* Shift value right by val bits */
+void bn_sr(bn_t *destn, bn_t *source, ulong val)
 {
-	if (number == NULL || number->num == NULL)
-		return;
+	if(source->size == 0 || destn->size == 0) return;
  
-	ulong tmp, carry = 0, shift, *start, *end;
+	ulong tmp, carry = 0, shift, *src, *dst_st, *dst_end;
 	byte inc;
-	size_t size;
+	size_t size1, size2;
 	
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
-		start = number->num;
-		end = number->num + number->size/sizeof(ulong) - 1;
-		inc = 1;
-	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
-		start = number->num  + number->size/sizeof(ulong) - 1;
-		end = number->num;
+		src = source->num;
+		dst_end = destn->num;
+		dst_st = destn->num + destn->size/sizeof(ulong) - 1;
 		inc = -1;
+	#elif(defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN)
+		src = source->num + source->size/sizeof(ulong) - 1;
+		dst_st = destn->num;
+		dst_end = destn->num + destn->size/sizeof(ulong) - 1;
+		inc = 1;
 	#else
 		#error "Unsupported architecture!"
 	#endif
 
-	/* Full byte to be shifted */
+	/* Set numbers size */
+	size1 = source->size/sizeof(ulong);
+	size2 = destn->size/sizeof(ulong);
+	/* Set full byte chunks shift */
 	shift = val/(sizeof(ulong)*8);
+	if(shift > size2) shift = size2;
+	/* Set val to remaining bits to shift */
+	val -= shift*(sizeof(ulong)*8);
+
+	/* Check for size cases 
+	* If the two sizes are equal shift the source end to ignore cut off chunks
+	* If the destination is bigger shift the destn end to ignore useless chunks 
+	* and if the shift will overflow anyway shift the source end to ignore cut off chunks
+	*/
+	if(size2 == size1)
+	{
+		size1 -= shift;
+		src -= inc*shift;
+	}
+	else
+	{
+		tmp = size1+shift;
+		if(size2 < tmp)
+		{
+			src -= (tmp-size2);
+			size1 -= (tmp-size2);
+			tmp = size2;
+		}
+
+		dst_end -= inc*(size2-tmp);
+		size2 -= size2-tmp;
+	}
+
+	/* Shift chunk into new position */
+	while(size1 > 0)
+	{
+		*dst_end = *src;
 	
-	if(shift > 0)
-	{
-		/* Rest bits to be shifted */
-		val -= shift*(sizeof(ulong)*8);
-		/* Bytes offset to be copyed */
-		size = number->size/sizeof(ulong);
-		
-		if(size > shift)
-		{
-			size -= shift;
-			tmp = shift;
-		}
-		else if(size <= shift)
-		{
-			tmp = size;
-			size = 0;
-		};
-
-		while(size > 0)
-		{
-			*start = *(start+(inc*shift));
-			
-			/* Decrement iterators */
-			start += inc;
-			--size;
-		}
-		while(tmp > 0)
-		{
-			*start = 0;
-			start += inc;
-			--tmp;
-		}
+		src -= inc;
+		dst_end -= inc;
+		--size1;
+		--size2;
 	}
-
-	size = number->size/sizeof(ulong);
-
-	while(size > 0 && val > 0)
+	/* Set remaining bytes to 0 */
+	while(size2 > 0)
 	{
-		/* Store the carry for the next chunk */
-		tmp = (*end & (ULONG_MAX >> (sizeof(ulong)*8-val))) << (sizeof(ulong)*8-val);
-		/* Shift the chunk */
-		*end >>= val;
-		/* Insert carry bytes in the shifteed space */
-		*end |= carry;
-		
-		carry = tmp;
-		
+		*dst_end = 0;
+
+		dst_end -= inc;
+		--size2;
+	}
+	
+	/* Restore size for a new loop */
+	size2 = destn->size/sizeof(ulong);	
+
+	/* Shift remaining bits */
+	while(size2 > 0 && val > 0)
+	{
+		/* Store in tmp the carryf or the next chunk of bytes */
+		tmp = (*dst_st & (ULONG_MAX >> (sizeof(ulong)*8-val))) << (sizeof(ulong)*8-val);
+		/* Shift the value */
+		*dst_st >>= val;
+		/* Insert the carry */
+		*dst_st |= carry;
+		/* Set carry for the next chunk */
+		carry = tmp;	
 		tmp = 0;
-		end -= inc;
-		--size;
+		
+		dst_st += inc;
+		--size2;
 	}
-
 }
 
-/**
- * 	@brief Compare two numbers
- *	@param [in] number1 Initialized number
- *	@param [in] number2 Initialized number
- *	@param [in,out] result Single byte initialized
- * 	@note If they're equal result is set to 0, if number1 is greater, result is set to 1, if number2 is greater, result is set to 2
- */
+/* Compare two numbers 0 = equals, 1 = first bigger, 2 = second bigger*/
 void bn_comp(bn_t *number1, bn_t *number2, ubyte *result)
 {
 	size_t size1 = number1->size/sizeof(ulong);

@@ -47,7 +47,7 @@ typedef struct BN_T
 ################################
 */
 
-void bn_init(bn_t *number, size_t size);					/* Initialize n bytes and set them to 0 */
+void bn_init(bn_t *number, size_t size);							/* Initialize n bytes and set them to 0 */
 void bn_init_n(bn_t *number, ulong value);
 void bn_init_s(bn_t *number, char *string);
 
@@ -57,10 +57,10 @@ void bn_init_s(bn_t *number, char *string);
 ################################
 */
 
-void bn_sum(bn_t *number1, bn_t *number2);						/* Add number2 into number1 */
-void bn_sub(bn_t *number1, bn_t *number2);						/* Subtract number2 from number1 */
-void bn_mul(bn_t *number1, bn_t *number2);						/* Multiply number1 by number2 */
-void bn_div(bn_t *number1, bn_t *number2, bn_t *rest);			/* Divide number1 by number2 and store the rest */
+void bn_add(bn_t *destn, bn_t *number1, bn_t *number2);				/* Add number2 into number1 */
+void bn_sub(bn_t *destn, bn_t *number1, bn_t *number2);				/* Subtract number2 from number1 */
+void bn_mul(bn_t *number1, bn_t *number2);							/* Multiply number1 by number2 */
+void bn_div(bn_t *number1, bn_t *number2, bn_t *rest);				/* Divide number1 by number2 and store the rest */
 
 
 /*
@@ -69,18 +69,17 @@ void bn_div(bn_t *number1, bn_t *number2, bn_t *rest);			/* Divide number1 by nu
 ################################
 */
 				
-void bn_inc(bn_t *number);										/* Increment number by one */
-void bn_dec(bn_t *number);										/* Decrement number by one */
-void bn_ext(bn_t *number, size_t bytes);						/* Extend number size by n bytes */
-void bn_free(bn_t *number);										/* Free number */
-void bn_sl(bn_t *number, ulong val);							/* Shift number left by one bit */
-void bn_sr(bn_t *number, ulong val);							/* Shift number right by one bit */
-void bn_srk(bn_t *number);										/* Shrink empty bytes from the front of the number */
-void bn_cpy(bn_t *result, bn_t *number);						/* Copy number into result reallocating the size */
-void bn_hcpy(bn_t *result, bn_t *number);						/* Copy number into result without reallocating (set to 0 the surplus) */
-void bn_ncpy(bn_t *result, bn_t *number, size_t size);			/* Copy n bytes from number to result starting from the less valuable byte */
-void bn_rev(bn_t *number);										/* Revers byte order */
-void bn_comp(bn_t *number1, bn_t *number2, ubyte *result);		/* Compare numbers and set check to 0: equal, 1: first bigger, 2: second bigger */
+void bn_ext(bn_t *destn, bn_t *source, size_t bytes);				/* Extend number size by n bytes */
+void bn_free(bn_t *number);											/* Free number */
+void bn_sl(bn_t *destn, bn_t *source, ulong val);					/* Shift number left by one bit */
+void bn_sr(bn_t *destn, bn_t *source, ulong val);					/* Shift number right by one bit */
+void bn_srk(bn_t *destn, bn_t *source);								/* Shrink empty bytes from the front of the number */
+void bn_cpy(bn_t *destn, bn_t *source);								/* Copy source into destn reallocating the size */
+void bn_hcpy(bn_t *destn, bn_t *source);							/* Copy source into destn without reallocating (set to 0 the surplus) */
+void bn_ncpy(bn_t *destn, bn_t *source, size_t size);				/* Copy n bytes from number to result starting from the less valuable byte */
+void bn_rev(bn_t *destn, bn_t *source);								/* Revers byte order */
+void bn_flip(bn_t *destn, bn_t *source);							/* Flip */
+void bn_comp(bn_t *number1, bn_t *number2, ubyte *result);			/* Compare numbers and set check to 0: equal, 1: first bigger, 2: second bigger */
 
 /*
 ################################
@@ -88,7 +87,7 @@ void bn_comp(bn_t *number1, bn_t *number2, ubyte *result);		/* Compare numbers a
 ################################
 */
 
-char * bntobs(bn_t *number);									/* Convert number to binary string */
+char * bntobs(bn_t *number);										/* Convert number to binary string */
 
 
 /*
@@ -97,7 +96,7 @@ char * bntobs(bn_t *number);									/* Convert number to binary string */
 ################################
 */
 
-void bn_print(bn_t *number);									/* Print number into stdout in binary string format */
+void bn_print(bn_t *number);										/* Print number into stdout in binary string format */
 
 
 #endif
