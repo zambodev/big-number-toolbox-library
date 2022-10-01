@@ -24,5 +24,5 @@ gcc -o output_name your_file_name -l bntl -I header_folder -L lib_folder
 ```
 
 ## Info
-- **Numbers:** Are unsigned long which size depends on the architecture to match full CPU capabilities
+- **Numbers:** Chunks of unsigned long, which size depends on the architecture to match full CPU capabilities, allocated in the heap
 - **Byte order:** The number's byte order follow the CPU architercture
