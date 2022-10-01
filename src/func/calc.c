@@ -10,15 +10,15 @@ void bn_add(bn_t *destn, bn_t *number1, bn_t *number2)
 	byte inc;
 	size_t size, size1, size2;
 
+	/* Extends result if allocated space isn't enough */
+	tmp = (number1->size < number2->size) ? number2->size : number1->size;
+	if(destn->size < tmp)
+		bn_ext(destn, destn, (tmp - destn->size));	
+
 	size = destn->size/sizeof(ulong);
 	size1 = number1->size/sizeof(ulong);
 	size2 = number2->size/sizeof(ulong);
 	shift = sizeof(ulong)*8/2;
-
-	/* Extends result if allocated space isn't enough */
-	tmp = (size1 < size2) ? size2 : size1;
-	if(destn->size < tmp)
-		bn_ext(destn, destn, (tmp - size)*sizeof(ulong));
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
 		num1 = number1->num;
@@ -87,15 +87,15 @@ void bn_sub(bn_t *destn, bn_t *number1, bn_t *number2)
 	byte inc;
 	size_t size, size1, size2;
 
+	/* Extends result if allocated space isn't enough */
+	tmp = (number1->size < number2->size) ? number2->size : number1->size;
+	if(destn->size < tmp)
+		bn_ext(destn, destn, (tmp - destn->size));	
+
 	size = destn->size/sizeof(ulong);
 	size1 = number1->size/sizeof(ulong);
 	size2 = number2->size/sizeof(ulong);
 	shift = sizeof(ulong)*8/2;
-
-	/* Extends result if allocated space isn't enough */
-	tmp = (size1 < size2) ? size2 : size1;
-	if(destn->size < tmp)
-		bn_ext(destn, destn, (tmp - size)*sizeof(ulong));
 
 	#if(defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN)
 		num1 = number1->num;

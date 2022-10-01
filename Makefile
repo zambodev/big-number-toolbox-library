@@ -9,18 +9,19 @@ INC = $(SRC)/include
 BIN = bin
 BUILD = build
 LIB = lib
+TEST = test
 CFL := $(BIN) $(BUILD) $(LIB)	# Create Folders List
 
 # Files
 LIBA = libbntl.a
 INCLIB = bntl
-MAIN = test/test.c
+TESTFILE = $(basename $(word 1, $(MAKECMDGOALS))).c
 HEAD = $(INC)/include.h
 SRCS := $(wildcard $(FUNC)/*.c)
 OBJS := $(addprefix $(BUILD)/, $(notdir $(SRCS:.c=.o)))
 
 # Executables
-TEST = $(BIN)/test
+EXE = $(basename $(TESTFILE))
 
 # Architecture
 ARCH = $(shell uname -m)
@@ -28,7 +29,6 @@ ARCH = $(shell uname -m)
 # Aesthetics
 GREEN = \033[0;32m
 RESET = \033[0m
-
 
 all: archinfo $(CFL) $(LIBA)
 
@@ -47,6 +47,11 @@ $(LIBA): $(OBJS)
 	@ rm *.a
 	@echo -e '	$(GREEN)Done$(RESET)'
 
+# Compile the test file
+$(TESTFILE): all
+	@ $(CC) $(CFLAGS) -o $(BIN)/$(EXE) $(TEST)/$(TESTFILE) -l$(INCLIB) -I$(INC)/ -L$(LIB)/ -lpthread
+	./$(BIN)/$(EXE)
+
 # Check if all needed directory exists, if not, creates it
 $(CFL):
 ifeq ("$(wildcard $@)", "")
@@ -55,18 +60,10 @@ ifeq ("$(wildcard $@)", "")
 	@echo -e '			$(GREEN)Done$(RESET)'
 endif
 
-# Compile the test file
-$(TEST): $(CFL) $(LIBA)
-	@ $(CC) $(CFLAGS) -o $@ $(MAIN) -l$(INCLIB) -I $(INC)/ -L $(LIB)/ -lpthread
-
 # Print architecture info
 archinfo:
+	@echo 'Test file: $(TESTFILE)'
 	@echo 'Building on $(ARCH) architecture'
-
-# Run the test file
-test: $(TEST)
-	@echo ' '
-	./$^
 
 # Clear folders
 clean:
@@ -75,3 +72,4 @@ clean:
 # Clear folders and delete the directories
 cleanall:
 	rm -r $(BIN)/ $(BUILD)/ $(LIB)/
+
