@@ -8,7 +8,7 @@ ulong nanos()
 {
 	struct timespec t;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-	return (ulong)t.tv_sec*1000000000+(ulong)t.tv_nsec;
+	return (ulong)t.tv_sec*1000000+(ulong)t.tv_nsec;
 }
 
 int main()
@@ -49,9 +49,9 @@ int main()
 	bn_free(&num2);
 	bn_free(&sum_check);
 
-	printf("Allocation time: %lu nanosec\n", alloc_end-alloc_st);
-	printf("Addition time: %lu nanosec\n", add_end-add_st);
-	printf("Subtraction time: %lu nanosec\n", sub_end-sub_st);
+	printf("Allocation time: %lu microseconds\n", alloc_end-alloc_st);
+	printf("Addition time: %lu microseconds\n", add_end-add_st);
+	printf("Subtraction time: %lu microseconds\n", sub_end-sub_st);
 	
 	return EXIT_SUCCESS;
 }
