@@ -1,4 +1,5 @@
-#include "../include/bntl.h"
+#include "util.h"
+#include "init.h"
 
 
 /* Free number */

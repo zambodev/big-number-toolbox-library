@@ -1,4 +1,6 @@
-#include "../include/bntl.h"
+#include "calc.h"
+#include "util.h"
+
 
 /* Add two numbers */
 void bn_add(bn_t *destn, bn_t *number1, bn_t *number2)

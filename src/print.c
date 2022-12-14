@@ -1,4 +1,4 @@
-#include "../include/bntl.h"
+#include "print.h"
 
 
 /* Print a number into stdout formatting in (rows of 8, space seprarated, bytes) */

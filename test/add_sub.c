@@ -8,13 +8,14 @@ ulong nanos()
 {
 	struct timespec t;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &t);
-	return (ulong)t.tv_sec*1000000+(ulong)t.tv_nsec;
+	return (ulong)t.tv_sec*1000000000+(ulong)t.tv_nsec;
 }
 
 int main()
 {	
 	bn_t num1, num2, sum_check;
 
+	ulong total_st = nanos();
 	ulong alloc_st = nanos();
 
 	bn_init_s(&num1, "B100000110000111100111100000001011100111111101010110101101001011011100100110101101011110101110110110110011000000100011011000110110010100011110011001111111001011100000100110100011010110111000010000001111010110110101110001011111010111000101111010100001100011");
@@ -49,9 +50,12 @@ int main()
 	bn_free(&num2);
 	bn_free(&sum_check);
 
-	printf("Allocation time: %lu microseconds\n", alloc_end-alloc_st);
-	printf("Addition time: %lu microseconds\n", add_end-add_st);
-	printf("Subtraction time: %lu microseconds\n", sub_end-sub_st);
+	ulong total_end = nanos();
+
+	printf("Total time: %lu nanosec\n", total_end-total_st);
+	printf("Allocation time: %lu nanosec\n", alloc_end-alloc_st);
+	printf("Addition time: %lu nanosec\n", add_end-add_st);
+	printf("Subtraction time: %lu nanosec\n", sub_end-sub_st);
 	
 	return EXIT_SUCCESS;
 }

@@ -1,4 +1,4 @@
-#include "../include/bntl.h"
+#include "init.h"
 
 
 /* Initialize a number setting the value at zero */

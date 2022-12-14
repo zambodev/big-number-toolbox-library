@@ -1,4 +1,4 @@
-#include "../include/bntl.h"
+#include "conv.h"
 
 
 /* Convert a number into a string */

@@ -4,8 +4,6 @@ CFLAGS = -Wall -g
 
 # Folders
 SRC = src
-FUNC = $(SRC)/func
-INC = $(SRC)/include
 BIN = bin
 BUILD = build
 LIB = lib
@@ -16,8 +14,7 @@ CFL := $(BIN) $(BUILD) $(LIB)	# Create Folders List
 LIBA = libbntl.a
 INCLIB = bntl
 TESTFILE = $(basename $(word 1, $(MAKECMDGOALS))).c
-HEAD = $(INC)/include.h
-SRCS := $(wildcard $(FUNC)/*.c)
+SRCS := $(wildcard $(SRC)/*.c)
 OBJS := $(addprefix $(BUILD)/, $(notdir $(SRCS:.c=.o)))
 
 # Executables
@@ -33,7 +30,7 @@ RESET = \033[0m
 all: archinfo $(CFL) $(LIBA)
 
 # Build c files into object files
-$(BUILD)/%.o: $(FUNC)/%.c
+$(BUILD)/%.o: $(SRC)/%.c
 	@echo -n 'Building object $^: '
 	@ $(CC) -c $(CFLAGS) $^
 	@ mv *.o $(BUILD)
@@ -49,7 +46,7 @@ $(LIBA): $(OBJS)
 
 # Compile the test file
 $(TESTFILE): all
-	@ $(CC) $(CFLAGS) -o $(BIN)/$(EXE) $(TEST)/$(TESTFILE) -l$(INCLIB) -I$(INC)/ -L$(LIB)/ -lpthread
+	@ $(CC) $(CFLAGS) -o $(BIN)/$(EXE) $(TEST)/$(TESTFILE) -l$(INCLIB) -I$(SRC)/ -L$(LIB)/
 	./$(BIN)/$(EXE)
 
 # Check if all needed directory exists, if not, creates it
