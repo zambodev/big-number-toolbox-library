@@ -1,6 +1,6 @@
 # ompiler settings
 CC = gcc
-CFLAGS = -Wall -g 
+CFLAGS = -Wall -g -O3 
 
 # Folders
 SRC = src
