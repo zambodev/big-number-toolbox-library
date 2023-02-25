@@ -1,6 +1,9 @@
-# ompiler settings
+# Compiler settings
 CC = gcc
-CFLAGS = -Wall -g 
+CFLAGS = -O3 
+ifeq (debug, $(filter debug, $(MAKECMDGOALS)))
+	CFLAGS += -Wall -DDEBUG
+endif
 
 # Folders
 SRC = src
@@ -13,7 +16,7 @@ CFL := $(BIN) $(BUILD) $(LIB)	# Create Folders List
 # Files
 LIBA = libbntl.a
 INCLIB = bntl
-TESTFILE = $(basename $(word 1, $(MAKECMDGOALS))).c
+TESTFILE = $(filter-out debug, $(MAKECMDGOALS))
 SRCS := $(wildcard $(SRC)/*.c)
 OBJS := $(addprefix $(BUILD)/, $(notdir $(SRCS:.c=.o)))
 
@@ -57,9 +60,13 @@ ifeq ("$(wildcard $@)", "")
 	@echo -e '			$(GREEN)Done$(RESET)'
 endif
 
+# Ignore debug target
+debug: 
+	echo -n
+
 # Print architecture info
 archinfo:
-	@echo 'Test file: $(TESTFILE)'
+	@echo 'Test file: $(TESTFILE))'
 	@echo 'Building on $(ARCH) architecture'
 
 # Clear folders

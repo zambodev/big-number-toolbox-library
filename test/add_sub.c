@@ -4,6 +4,9 @@
 #include <pthread.h>
 #include <bntl.h>
 
+#define SIZE 8192
+
+
 ulong nanos()
 {
 	struct timespec t;
@@ -18,10 +21,22 @@ int main()
 	ulong total_st = nanos();
 	ulong alloc_st = nanos();
 
-	bn_init_s(&num1, "B100000110000111100111100000001011100111111101010110101101001011011100100110101101011110101110110110110011000000100011011000110110010100011110011001111111001011100000100110100011010110111000010000001111010110110101110001011111010111000101111010100001100011");
-	bn_init_s(&num2, "B0000000010000010110001111111011000110000000011111000100011101011100000110100100111010000101101010110110111101000001000110101110110010000001110110010111100001010001000110000110001110101001011110100100000010010001001010110011110001001010011011010110001011111");
+	char *str = malloc(SIZE);
+	char *str2 = malloc(SIZE);
+
+	FILE *file = fopen("./data/nums.txt", "r");
+	fread(str, 1, SIZE, file);
+	fread(str2, 1, SIZE, file);
+	fclose(file);
+
+
+	bn_init_s(&num1, str);
+	bn_init_s(&num2, str2);
 	bn_init(&sum_check, num1.size);
 	bn_cpy(&sum_check, &num1);
+
+	free(str);
+	free(str2);
 
 	ulong alloc_end = nanos();
 
@@ -52,10 +67,10 @@ int main()
 
 	ulong total_end = nanos();
 
-	printf("Total time: %lu nanosec\n", total_end-total_st);
-	printf("Allocation time: %lu nanosec\n", alloc_end-alloc_st);
-	printf("Addition time: %lu nanosec\n", add_end-add_st);
-	printf("Subtraction time: %lu nanosec\n", sub_end-sub_st);
+	printf("Total time: %f ms\n", (total_end-total_st)*1e-6);
+	printf("Allocation time: %f ms\n", (alloc_end-alloc_st)*1e-6);
+	printf("Addition time: %f ms\n", (add_end-add_st)*1e-6);
+	printf("Subtraction time: %f ms\n", (sub_end-sub_st)*1e-6);
 	
 	return EXIT_SUCCESS;
 }
