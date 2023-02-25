@@ -42,10 +42,12 @@ int main()
 	free(str);
 	free(str2);
 
+#ifdef DEBUG
 	printf("Allocate num1(%lu B):\n", num1.size);
 	bn_print(&num1);
 	printf("Allocate num2(%lu B):\n", num2.size);
 	bn_print(&num2);
+#endif
 
 	for(int i=0; i<100; ++i)
 	{
