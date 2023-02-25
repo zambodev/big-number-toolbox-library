@@ -6,26 +6,36 @@
 
 This library implements mathematical operations for numbers over the usual 64bit limit as efficently as possible and tries to keep a reasonable readability
 
----
+<br>
 
 ## Get started
 ```bash
 # Build the library and create the archive
 make
 
-# Run test from test/
-make test_name.c
-
 # Link into a project
 gcc -o output_name your_file_name -l bntl -I header_folder -L lib_folder
+    
+# Run test from test/ folder
+# Use "debug" flag to run in debug mode (gcc -Wall -DDEBUG)
+make debug test_name.c
 ```
----
+
+<br>
 
 ## Code sample
 ```C
 	/* Coming soon... */
 ```
 
+<br>
+
 ## Info
-- **Numbers:** Chunks of unsigned long, which size depends on the architecture to match full CPU capabilities, allocated in the heap
-- **Byte order:** The number's byte order follow the CPU architercture
+- **Numbers:** Chunks of unsigned long, which size depends on the architecture to match full CPU capabilities, dynamically allocated
+- **Byte order:** The number's byte order is the same as the CPU's
+
+<br>
+
+## Contribute
+To contribute follow the istructions in [CONTRIBUTING.md](./CONTRIBUTING.md)<br>
+Devlopment version of the repo is in the "dev" branch
