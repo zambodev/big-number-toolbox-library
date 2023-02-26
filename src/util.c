@@ -45,7 +45,7 @@ void bn_cpy(bn_t *destn, bn_t *source)
 	}
 }
 
-/* Copy value from source to destination not reallocating destinatino memory */
+/* Copy value from source to destination without reallocating destination memory */
 void bn_hcpy(bn_t *destn, bn_t *source)
 {
 	if(source->size == 0) return;
@@ -177,7 +177,7 @@ void bn_flip(bn_t *destn, bn_t *source)
 	}
 }
 
-/* Extend a source by n bytes */
+/* Extend source by n bytes */
 void bn_ext(bn_t *destn, bn_t *source, size_t bytes)
 {
 	if(source->size == 0) return;
@@ -192,7 +192,7 @@ void bn_ext(bn_t *destn, bn_t *source, size_t bytes)
 	bn_free(&tmp);
 }
 
-/* Shrink unused bytes in front of the value */
+/* Shrink empty bytes in front of the value */
 void bn_srk(bn_t *destn, bn_t *source)
 {
 	if(source->size == 0) return;
