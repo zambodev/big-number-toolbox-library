@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <bntl.h>
 
 #define SIZE 8192
@@ -15,63 +16,62 @@ ulong nanos()
 }
 
 int main()
-{	
-	bn_t num1, num2, sum_check;
-
-	ulong total_st = nanos();
-	ulong alloc_st = nanos();
-
+{
 	char *str = malloc(SIZE);
 	char *str2 = malloc(SIZE);
+	double add_bench = 0.0, sub_bench = 0.0;
+	FILE *file;
+	bn_t num1, num2;
 
-	FILE *file = fopen("./data/nums.txt", "r");
+	while((file = fopen("/tmp/bitstr.txt", "r")) == NULL)
+	{
+		char str[256];
+		snprintf(str, 256, "python3 ./data/gen_bitstr.py %d %d", SIZE, SIZE);
+		
+		printf("Missing /tmp/bitstr.txt, running data/gen_bitstr.py...");
+		fflush(stdout);
+		
+		system(str);
+	}
 	fread(str, 1, SIZE, file);
 	fread(str2, 1, SIZE, file);
 	fclose(file);
 
-
 	bn_init_s(&num1, str);
 	bn_init_s(&num2, str2);
-	bn_init(&sum_check, num1.size);
-	bn_cpy(&sum_check, &num1);
-
 	free(str);
 	free(str2);
 
-	ulong alloc_end = nanos();
-
+#ifdef DEBUG
 	printf("Allocate num1(%lu B):\n", num1.size);
 	bn_print(&num1);
 	printf("Allocate num2(%lu B):\n", num2.size);
 	bn_print(&num2);
-	printf("Allocate sum_check(%lu B):\n", sum_check.size);
-	bn_print(&sum_check);
+#endif
 
-	/* num1 = num1 + num2 */
-	ulong add_st = nanos();
-	bn_add(&num1, &num1, &num2);
-	ulong add_end = nanos();
-	/* num2 = num1 - num2 */
-	ulong sub_st = nanos();
-	bn_sub(&num2, &num1, &num2);
-	ulong sub_end = nanos();
+	for(int i=0; i<100; ++i)
+	{
+		/* num1 = num1 + num2 */
+		ulong add_st = nanos();
+		bn_add(&num1, &num1, &num2);
+		ulong add_end = nanos();
 
-	/* The result should be the initial num1 */
-	ubyte check;
-	bn_comp(&sum_check, &num2, &check);
-	printf("Check (pass if 0): %u\n", check);
+		ulong sub_st = nanos();
+		bn_sub(&num1, &num1, &num2);
+		ulong sub_end = nanos();
+
+		printf("Add time: %f ms\n", (add_end-add_st)*1e-6);
+		printf("Sub time: %f ms\n", (sub_end-sub_st)*1e-6);
+		add_bench += (add_end-add_st)*1e-6;
+		sub_bench += (sub_end-sub_st)*1e-6;
+	}
+
+	printf("\nAdd avg: %f ms\n", add_bench/100);
+	printf("Sub avg: %f ms\n", sub_bench/100);
 
 	bn_free(&num1);
 	bn_free(&num2);
-	bn_free(&sum_check);
 
-	ulong total_end = nanos();
-
-	printf("Total time: %f ms\n", (total_end-total_st)*1e-6);
-	printf("Allocation time: %f ms\n", (alloc_end-alloc_st)*1e-6);
-	printf("Addition time: %f ms\n", (add_end-add_st)*1e-6);
-	printf("Subtraction time: %f ms\n", (sub_end-sub_st)*1e-6);
-	
 	return EXIT_SUCCESS;
 }
 
