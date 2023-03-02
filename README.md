@@ -23,13 +23,6 @@ make debug test_name.c
 
 <br>
 
-## Code sample
-```C
-	/* Coming soon... */
-```
-
-<br>
-
 ## Info
 - **Numbers:** Chunks of unsigned long, which size depends on the architecture to match full CPU capabilities, dynamically allocated
 - **Byte order:** The number's byte order is the same as the CPU's
