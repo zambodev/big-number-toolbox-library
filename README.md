@@ -30,5 +30,5 @@ make debug test_name.c
 <br>
 
 ## Contribute
-To contribute follow the istructions in [CONTRIBUTING.md](./CONTRIBUTING.md)<br>
+To contribute follow the instructions in [CONTRIBUTING.md](./CONTRIBUTING.md)<br>
 Devlopment version of the repo is in the "dev" branch
