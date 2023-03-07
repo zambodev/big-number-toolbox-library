@@ -1,5 +1,5 @@
 # Compiler settings
-CC = gcc
+CC = cc
 CFLAGS = -O3 
 ifeq (debug, $(filter debug, $(MAKECMDGOALS)))
 	CFLAGS += -Wall -DDEBUG
