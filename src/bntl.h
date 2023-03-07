@@ -20,7 +20,8 @@ typedef struct BN_T
 } bn_t;
 
 #include "init.h"
-#include "calc.h"
+#include "basic.h"
+#include "bitwise.h"
 #include "util.h"
 #include "conv.h"
 #include "print.h"
